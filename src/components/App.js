@@ -2,12 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import '../css/index.css';
+import Modal from './inc/modal.js';
+import Nav from './inc/nav.js';
+import Side from './inc/side.js';
 
 class App extends React.Component{
     state ={data: []}
     
     ooiienm= async (props) =>{
-        const response = await axios.get('http://localhost/HR/public/students',{
+        const response = await axios.get('http://localhost/Accounting_modified/public/api/students',{
             params:{
                 query: props
             },
@@ -19,6 +22,7 @@ class App extends React.Component{
 
     componentDidMount(){
         //this.ooiienm();
+        
     }
 
     render(){
@@ -28,7 +32,26 @@ class App extends React.Component{
         // });
         return (
             <div>
-                <h1>Accounting V2</h1>
+                <aside id="left-panel" className="left-panel" style={{minWidth : '250px'}}>
+                    <Side />
+                </aside>
+                <div id="right-panel" className="right-panel" style={{width : '100%'}}>
+                    <header id="header" className="header"> 
+                    <Nav />
+                    </header>
+                    <div className="">
+                        <div class="breadcrumbs">
+                            <div class="page-header float-left">
+                                <div class="page-title">
+                                    <h1>Accounting V2</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="SampleButton" data-toggle="modal" data-target="#exampleModal" className="btn btn-primary">Sample Button</button>
+                    </div>
+                    <Modal />
+                </div>
+                
             </div>
         );
     }

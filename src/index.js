@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App.js';
+import RouteController from './components/router/router.js';
 
 
 ReactDOM.render(
-    <App />,
+    <RouteController />,
     document.querySelector('#root')
 );
