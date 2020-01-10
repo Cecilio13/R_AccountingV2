@@ -77,7 +77,7 @@ class JournalEntry extends React.Component{
         this.setState({JournalNoSelected : parseFloat(response.data.JournalNoSelected)+1});
         this.setState({saleeee : response.data.saleeee});
         this.setState({searchKeyword : response.data.keyword});
-        
+        document.getElementById('rendertablejournallist').click();
         
     }
     componentDidUpdate(prevProps, prevState){
@@ -110,7 +110,7 @@ class JournalEntry extends React.Component{
         if(invoice_validforcancel==1){
             
         }else{
-            if(journal.remark=="" && journal.remark==null ){
+            if(journal.remark=="" || journal.remark==null ){
                 var locationssss="";
                 var invoice_typesss="";
                 if(journal.je_invoice_location_and_type!="" && journal.je_invoice_location_and_type!=null){
@@ -119,11 +119,27 @@ class JournalEntry extends React.Component{
                     invoice_typesss=answer_array[1]+" "+answer_array[2];
                 }
                 
-                return <a className="dropdown-item" href="#" onClick={()=> this.canceltransaction(journal.je_transaction_type, journal.je_other_no, locationssss, invoice_typesss)}>Cancel Transaction</a>
+                return <a className="dropdown-item" href="#" onClick={()=> this.canceltransaction(journal.je_transaction_type, journal.other_no, locationssss, invoice_typesss)}>Cancel Transaction</a>
             }else{
                 return <a className="dropdown-item" href="#" >Cancelled</a>
             }
-            
+        }
+    }
+    canceltransaction= async (type,id,locationss,invoice_type) =>{
+        console.log(type+" "+id+" "+locationss+" "+invoice_type);
+        var Reason = prompt("Reason for Cancellation of Entry", "");
+        if (Reason != null) {
+            var bodyFormData = new FormData();
+                bodyFormData.set('type', type);
+                bodyFormData.set('id', id);
+                bodyFormData.set('locationss', locationss);
+                bodyFormData.set('invoice_type', invoice_type);
+                bodyFormData.set('Reason', Reason);
+                const response = await axios.post('http://localhost/Accounting_modified/public/api/cancel_entry',bodyFormData);
+                console.log(response.data);
+                window.location.reload();
+        }else{
+            alert('Action Cancelled');
         }
     }
     viewJournalEntryDetail = async (id)=>{
@@ -158,8 +174,10 @@ class JournalEntry extends React.Component{
     }
     showhide = (type) =>{
         if(type=="ChequeVoucher"){
+            this.setState({JournalType : 'ChequeVoucher'});
             document.getElementById('showeightcolumn').click();
         }else{
+            this.setState({JournalType : 'JournalVoucher'});
             document.getElementById('hideeightcolumn').click();
         }
     }
@@ -251,7 +269,7 @@ class JournalEntry extends React.Component{
                             <div className="page-header float-left">
                                 <div className="page-title">
                                     <h1>Journal Entry</h1>
-                                    
+                                    <button type="button" style={{display : 'none'}} id="rendertablejournallist"></button>
                                 </div>
                             </div>
                         </div>
@@ -268,7 +286,7 @@ class JournalEntry extends React.Component{
                                     <div className="modal-body" style={{textAlign : 'center'}}>
                                         
                                         <input id="excel-upload-journal" onChange={()=>this.UploadMassJournalEntry()} type="file"  accept=".xlsx" />
-                                        <label htmlFor="excel-upload-journal" style={{opacity : '1', cursor : 'pointer', border : '10px'}} id="FIleImportExcelLabel" className="custom-excel-upload btn btn-primary">
+                                        <label htmlFor="excel-upload-journal" style={{opacity : '1', cursor : 'pointer', borderRadius : '10px'}} id="FIleImportExcelLabel" className="custom-excel-upload btn btn-primary">
                                         <span className="glyphicon glyphicon-user"> IMPORT FROM EXCEL</span>
                                         </label>
                                         
@@ -362,8 +380,8 @@ class JournalEntry extends React.Component{
                             <div className="row" >
                                 <div className="col-md-12" >
                                     <div className=" mr-2 mb-5 mt-3">
-                                        <a href="#" className="mr-1 btn btn-success" data-target='#journalentrymodal' onClick={(event)=> this.setState({JournalType : 'ChequeVoucher'}),()=> this.showhide('ChequeVoucher')} data-toggle="modal">Create New Cheque Voucher</a>
-                                        <a href="#" className="mr-1 btn btn-success" data-target='#journalentrymodal' onClick={(event)=> this.setState({JournalType : 'JournalVoucher'}),()=> this.showhide('JournalVoucher')} data-toggle="modal">Create New Journal Voucher</a>
+                                        <a href="#" className="mr-1 btn btn-success" data-target='#journalentrymodal' onClick={()=> this.showhide('ChequeVoucher')} data-toggle="modal">Create New Cheque Voucher</a>
+                                        <a href="#" className="mr-1 btn btn-success" data-target='#journalentrymodal' onClick={()=> this.showhide('JournalVoucher')} data-toggle="modal">Create New Journal Voucher</a>
                                         <a href="#" className="mr-1 btn btn-success" data-target='#ImportJournalEntryModal' data-toggle="modal">Import Journal Entry</a>
                                         
                                     </div>
@@ -387,9 +405,9 @@ class JournalEntry extends React.Component{
                             <div className="row">
                                 <div className="col-md-12">
                                     <div id="table" className="table-editable">
-                                    <table id="jounalentrytable" className="table table-bordered table-responsive-md table-striped  font14" width="100%">
+                                    <table id="jounalentrytable" className="table table-bordered table-responsive-md font14" width="100%"  style={{backgroundColor: 'white'}}>
                                         <thead>
-                                            <tr>
+                                            <tr className="bg-ltgrey">
                                                 <th style={{display: 'none'}}></th>
                                                 <th style={{verticalAlign : 'middle'}} width="5%" className="text-center">JOURNAL DATE</th>
                                                 <th style={{verticalAlign : 'middle'}} width="5%" className="text-center">JOURNAL TYPE</th>
@@ -418,7 +436,7 @@ class JournalEntry extends React.Component{
                                     <div className="input-group-prepend">
                                     <button type="button" onClick={()=>this.changePageNumber(-20)} className="btn btn-secondary" style={{lineHeight: '2'}}><span className="fa fa-angle-double-left"></span></button>
                                     </div>
-                                    <input type="number" name="" id="currentjournal_no" value={parseFloat(this.state.JournalNoSelected)} onChange={(event)=> this.setState({JournalNoSelected: event.target.value})} min="0" step="20" className="form-control" style={{textAlign : 'center'}} />
+                                    <input type="number" id="currentjournal_no" value={parseFloat(this.state.JournalNoSelected)} onChange={(event)=> this.setState({JournalNoSelected: event.target.value})} min="0" step="20" className="form-control removeReadOnly" style={{textAlign : 'center'}} readOnly  />
                                     
                                     <div className="input-group-append">
                                         <button type="button"  onClick={()=>this.changePageNumber(20)} className="btn btn-secondary" style={{lineHeight: '2'}}><span className="fa fa-angle-double-right"></span></button>

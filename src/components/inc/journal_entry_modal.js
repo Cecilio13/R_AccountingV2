@@ -73,7 +73,7 @@ class JEModal extends React.Component{
             crossDomain: true
         });
         document.getElementById('journalcost_center_td'+row).innerHTML=response.data.name;
-        document.getElementById('journalcost_center_td'+row).setAttribute('data-costcenter_no',response.data.no);
+        document.getElementById('journalcost_center_td_input'+row).value=response.data.no;
     }
     setAccountJournalEntry = async(row) =>{
         var code=document.getElementById('accjournalcode'+row).value;
@@ -87,7 +87,7 @@ class JEModal extends React.Component{
             crossDomain: true
         });
         document.getElementById('journalcost_center_td'+row).innerHTML=response.data.name;
-        document.getElementById('journalcost_center_td'+row).setAttribute('data-costcenter_no',response.data.no);
+        document.getElementById('journalcost_center_td_input'+row).value=response.data.no;
     }
     DeleteAllRows = ()=>{
         
@@ -98,7 +98,24 @@ class JEModal extends React.Component{
             journalrow=2;
             
         }
-        
+        var debitJhint=0;
+        var creditJhint=0;
+        for(var c=1;c<=journalrow;c++){
+            var td3 = document.getElementById("journaldebit"+c);
+            var td4 = document.getElementById("journalcredit"+c);
+            if(td3.value!=""){
+                   
+                debitJhint=debitJhint+parseFloat(td3.value);
+                
+            }
+            if(td4.value!=""){
+                   
+                creditJhint=creditJhint+parseFloat(td4.value);
+                
+            }
+        }
+        document.getElementById('debit_total_hitn').innerHTML=number_format(debitJhint,2);
+        document.getElementById('credit_total_hitn').innerHTML=number_format(creditJhint,2);
     }
     AddTableRow(){
         const item = "asdasdasd";
@@ -110,6 +127,7 @@ class JEModal extends React.Component{
     refreshselecpickerselects =() =>{
         if(rerenderselectpicker==1){
             document.getElementById('setselectpickerbutton').click();
+            document.getElementById('rerenderdatatable').click();
             rerenderselectpicker=0;
         }
         
@@ -119,6 +137,24 @@ class JEModal extends React.Component{
         rows: this.state.rows.slice(0, -1)
     });
     journalrow--;
+        var debitJhint=0;
+        var creditJhint=0;
+        for(var c=1;c<=journalrow;c++){
+            var td3 = document.getElementById("journaldebit"+c);
+            var td4 = document.getElementById("journalcredit"+c);
+            if(td3.value!=""){
+                   
+                debitJhint=debitJhint+parseFloat(td3.value);
+                
+            }
+            if(td4.value!=""){
+                   
+                creditJhint=creditJhint+parseFloat(td4.value);
+                
+            }
+        }
+        document.getElementById('debit_total_hitn').innerHTML=number_format(debitJhint,2);
+        document.getElementById('credit_total_hitn').innerHTML=number_format(creditJhint,2);
     }
     submitJournalEntryModal = async (event) =>{
         event.preventDefault();
@@ -128,21 +164,17 @@ class JEModal extends React.Component{
         var debitJ=0;
         var creditJ=0;
         var PayeeCheck=1;
-
+        document.getElementById('journal_table_count').value=journalrow;
         for(var c=tr.length;c>0;c--){
-            console.log(c);
+            
             var td3 = document.getElementById("journaldebit"+c);
             var td4 = document.getElementById("journalcredit"+c);
             var payee_input = document.getElementById("journalnamename"+c);
             if(td3.value!=""){
-               
                 debitJ=debitJ+parseFloat(td3.value);
-                console.log("debit "+debitJ+"  "+td3.value);
             }
             if(td4.value!=""){
-                
                 creditJ=creditJ+parseFloat(td4.value);
-                console.log("credit "+creditJ+"  "+td4.value);
             }
             if(payee_input.value==""){
                 PayeeCheck=0;
@@ -150,13 +182,23 @@ class JEModal extends React.Component{
 
         }
         if(PayeeCheck==1){
-            if(debitJ==creditJ){
-                const bodyFormData = new FormData(event.target);
-                const response = await axios.post('http://localhost/Accounting_modified/public/api/SaveJournalEntry',bodyFormData);
-                console.log(response.data);
+            debitJ=number_format(debitJ,2);
+            creditJ=number_format(creditJ,2);
+            console.log(debitJ+"  "+creditJ);
+            if( debitJ!="0.00" && creditJ!="0.00"){
+                if(debitJ==creditJ){
+                    const bodyFormData = new FormData(event.target);
+                    console.log(event.target);
+                    const response = await axios.post('http://localhost/Accounting_modified/public/api/SaveJournalEntry',bodyFormData);
+                    console.log(response.data);
+                    window.location.reload();
+                }else{
+                    alert('Credit and Debit not Equal');
+                }
             }else{
-                alert('Credit and Debit not Equal');
+                alert('please check credit or debit amount');
             }
+            
         }else{                          
             alert("Payee Field is required");
         }
@@ -191,8 +233,8 @@ class JEModal extends React.Component{
                         <div className="modal-content" style={{minHeight :"100vh"}}>
                             <div className="modal-header">
                                 <h5 className="modal-title" id="journal_entry_title_header">{this.props.JournalType=="ChequeVoucher"? "Cheque Voucher" : "Journal Voucher"}</h5>
-                                <input type="hidden" name="journal_entry_type" id="journal_entry_type" value={this.props.JournalType} />
-                                <button type="button" className="close" data-dismiss="modal" id="Closeeee" aria-label="Close">
+                                
+                                <button type="button" className="close" data-dismiss="modal" id="Closeeee" aria-label="Close" onClick={()=>this.DeleteAllRows()}>
                                 <span aria-hidden="true">×</span>
                                 </button>
                             </div>
@@ -203,7 +245,8 @@ class JEModal extends React.Component{
                                         <div className="col-md-2 p-0">
                                             <p>Journal Date</p>
                                             <input type="date" name="journalDate" id="journalDate" value={this.props.current_date} required />
-                                            
+                                            <input type="hidden" name="journal_entry_type" id="journal_entry_type" value={this.props.JournalType} />
+                                            <input type="hidden" name="journal_table_count" id="journal_table_count" value="2" />
                                         </div>
                                         <div className="col-md-2 p-0">
                                         <p>Journal No.</p>
@@ -260,7 +303,7 @@ class JEModal extends React.Component{
                                                     <option value="">--Select--</option>
                                                     {coa_name_list}
                                                 </select>
-                                                
+                                                <input type="hidden" id="journalcost_center_td_input1" name="journalcost_center_td_input1"/>
                                             </td>
                                             <td className="pt-3-half"  id="journalcost_center_td1">
 
@@ -303,7 +346,8 @@ class JEModal extends React.Component{
                                                 <select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry('2')} required data-live-search="true" id="accjournbale2" name="accjournbale2" >
                                                     <option value="">--Select--</option>
                                                     {coa_name_list}
-                                                </select>    
+                                                </select>  
+                                                <input type="hidden" id="journalcost_center_td_input2" name="journalcost_center_td_input2"/>  
                                             </td>
                                             <td className="pt-3-half"  id="journalcost_center_td2">
 
@@ -335,6 +379,8 @@ class JEModal extends React.Component{
                                         </tr>
                                         {this.state.rows.map((item, idx) => {
                                             rerenderselectpicker=1;
+                                            var thirteenth ="";
+                                            document.getElementById('destroydatatable').click();
                                             var table = document.getElementById("journalentrytable");
 
                                             var first =table.rows[0].cells[0].innerHTML=="#"? <td className="pt-3-half"  style={{padding : '0px 0px 0px 2px'}}>{parseFloat(idx)+parseFloat(3)}</td>       : first;
@@ -348,7 +394,9 @@ class JEModal extends React.Component{
                                             var nineth =table.rows[0].cells[8].innerHTML=="#"? <td className="pt-3-half"  style={{padding : '0px 0px 0px 2px'}}>{parseFloat(idx)+parseFloat(3)}</td>      : nineth;
                                             var thenth =table.rows[0].cells[9].innerHTML=="#"? <td className="pt-3-half"  style={{padding : '0px 0px 0px 2px'}}>{parseFloat(idx)+parseFloat(3)}</td>      : thenth;
                                             var twelve =table.rows[0].cells[10].innerHTML=="#"? <td className="pt-3-half"  style={{padding : '0px 0px 0px 2px'}}>{parseFloat(idx)+parseFloat(3)}</td>     : twelve;
-                                            var thirteenth =table.rows[0].cells[11].innerHTML=="#"? <td className="pt-3-half"  style={{padding : '0px 0px 0px 2px'}}>{parseFloat(idx)+parseFloat(3)}</td> : thirteenth;
+                                            if(this.props.JournalType=="ChequeVoucher"){
+                                                thirteenth =table.rows[0].cells[11].innerHTML=="#"? <td className="pt-3-half"  style={{padding : '0px 0px 0px 2px'}}>{parseFloat(idx)+parseFloat(3)}</td> : thirteenth;
+                                            }
                                                 
                                                 first =table.rows[0].cells[0].innerHTML=="CODE"? (<td className="pt-3-half" ><select className="selectpicker form-control input-block-level" onChange={()=>this.setAccountJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} name={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_code_list}</select></td>)  : first;
                                                 second =table.rows[0].cells[1].innerHTML=="CODE"? (<td className="pt-3-half" ><select className="selectpicker form-control input-block-level" onChange={()=>this.setAccountJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} name={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_code_list}</select></td>) : second;
@@ -361,20 +409,25 @@ class JEModal extends React.Component{
                                                 nineth =table.rows[0].cells[8].innerHTML=="CODE"? (<td className="pt-3-half" ><select className="selectpicker form-control input-block-level" onChange={()=>this.setAccountJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} name={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_code_list}</select></td>)  : nineth;
                                                 thenth =table.rows[0].cells[9].innerHTML=="CODE"? (<td className="pt-3-half" ><select className="selectpicker form-control input-block-level" onChange={()=>this.setAccountJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} name={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_code_list}</select></td>)  : thenth;
                                                 twelve =table.rows[0].cells[10].innerHTML=="CODE"? (<td className="pt-3-half" ><select className="selectpicker form-control input-block-level" onChange={()=>this.setAccountJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} name={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_code_list}</select></td>) : twelve;
-                                                thirteenth =table.rows[0].cells[11].innerHTML=="CODE"? (<td className="pt-3-half" ><select className="selectpicker form-control input-block-level" onChange={()=>this.setAccountJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} name={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_code_list}</select></td>) : thirteenth;
+                                                if(this.props.JournalType=="ChequeVoucher"){
+                                                    thirteenth =table.rows[0].cells[11].innerHTML=="CODE"? (<td className="pt-3-half" ><select className="selectpicker form-control input-block-level" onChange={()=>this.setAccountJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} name={`accjournalcode${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_code_list}</select></td>) : thirteenth;
+                                                }
+                                                
 
-                                                first =table.rows[0].cells[0].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_name_list}</select></td>)  : first;
-                                                second =table.rows[0].cells[1].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : second;
-                                                third =table.rows[0].cells[2].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : third;
-                                                fourth =table.rows[0].cells[3].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : fourth;
-                                                fifth =table.rows[0].cells[4].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : fifth;
-                                                sixth =table.rows[0].cells[5].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : sixth;
-                                                seventh =table.rows[0].cells[6].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : seventh;
-                                                eighth =table.rows[0].cells[7].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : eighth;
-                                                nineth =table.rows[0].cells[8].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : nineth;
-                                                thenth =table.rows[0].cells[9].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : thenth;
-                                                twelve =table.rows[0].cells[10].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select></td>)  : twelve;
-                                                thirteenth =table.rows[0].cells[11].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`}name={`accjournbale${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_name_list}</select></td>)  : thirteenth;
+                                                first =table.rows[0].cells[0].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} />  </td>)  : first;
+                                                second =table.rows[0].cells[1].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : second;
+                                                third =table.rows[0].cells[2].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : third;
+                                                fourth =table.rows[0].cells[3].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : fourth;
+                                                fifth =table.rows[0].cells[4].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : fifth;
+                                                sixth =table.rows[0].cells[5].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : sixth;
+                                                seventh =table.rows[0].cells[6].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : seventh;
+                                                eighth =table.rows[0].cells[7].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : eighth;
+                                                nineth =table.rows[0].cells[8].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : nineth;
+                                                thenth =table.rows[0].cells[9].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : thenth;
+                                                twelve =table.rows[0].cells[10].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`} name={`accjournbale${parseFloat(idx)+parseFloat(3)}`}><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
+                                                thirteenth =table.rows[0].cells[11].innerHTML=="ACCOUNT"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`}name={`accjournbale${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : thirteenth;
+                                                }
 
                                                 first =table.rows[0].cells[0].innerHTML=="COST CENTER"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : first;
                                                 second =table.rows[0].cells[1].innerHTML=="COST CENTER"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : second;
@@ -387,7 +440,9 @@ class JEModal extends React.Component{
                                                 nineth =table.rows[0].cells[8].innerHTML=="COST CENTER"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : nineth;
                                                 thenth =table.rows[0].cells[9].innerHTML=="COST CENTER"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>) : thenth;
                                                 twelve =table.rows[0].cells[10].innerHTML=="COST CENTER"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>) : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="COST CENTER"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>) : thirteenth;
+                                                }
 
                                                 first =table.rows[0].cells[0].innerHTML=="DEBIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} id={`journaldebit${parseFloat(idx)+parseFloat(3)}`} name={`journaldebit${parseFloat(idx)+parseFloat(3)}`} /></td>)  : first;
                                                 second =table.rows[0].cells[1].innerHTML=="DEBIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} id={`journaldebit${parseFloat(idx)+parseFloat(3)}`} name={`journaldebit${parseFloat(idx)+parseFloat(3)}`} /></td>)  : second;
@@ -400,7 +455,9 @@ class JEModal extends React.Component{
                                                 nineth =table.rows[0].cells[8].innerHTML=="DEBIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} id={`journaldebit${parseFloat(idx)+parseFloat(3)}`} name={`journaldebit${parseFloat(idx)+parseFloat(3)}`} /></td>)  : nineth;
                                                 thenth =table.rows[0].cells[9].innerHTML=="DEBIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} id={`journaldebit${parseFloat(idx)+parseFloat(3)}`} name={`journaldebit${parseFloat(idx)+parseFloat(3)}`} /></td>)  : thenth;
                                                 twelve =table.rows[0].cells[10].innerHTML=="DEBIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} id={`journaldebit${parseFloat(idx)+parseFloat(3)}`} name={`journaldebit${parseFloat(idx)+parseFloat(3)}`} /></td>)  : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="DEBIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} id={`journaldebit${parseFloat(idx)+parseFloat(3)}`} name={`journaldebit${parseFloat(idx)+parseFloat(3)}`} /></td>)  : thirteenth;
+                                                }
 
                                                 first =table.rows[0].cells[0].innerHTML=="CREDIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))}  id={`journalcredit${parseFloat(idx)+parseFloat(3)}`} name={`journalcredit${parseFloat(idx)+parseFloat(3)}`} /></td>) : first;
                                                 second =table.rows[0].cells[1].innerHTML=="CREDIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))}  id={`journalcredit${parseFloat(idx)+parseFloat(3)}`} name={`journalcredit${parseFloat(idx)+parseFloat(3)}`} /></td>) : second;
@@ -413,7 +470,9 @@ class JEModal extends React.Component{
                                                 nineth =table.rows[0].cells[8].innerHTML=="CREDIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))}  id={`journalcredit${parseFloat(idx)+parseFloat(3)}`} name={`journalcredit${parseFloat(idx)+parseFloat(3)}`} /></td>) : nineth;
                                                 thenth =table.rows[0].cells[9].innerHTML=="CREDIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))}  id={`journalcredit${parseFloat(idx)+parseFloat(3)}`} name={`journalcredit${parseFloat(idx)+parseFloat(3)}`} /></td>) : thenth;
                                                 twelve =table.rows[0].cells[10].innerHTML=="CREDIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))}  id={`journalcredit${parseFloat(idx)+parseFloat(3)}`} name={`journalcredit${parseFloat(idx)+parseFloat(3)}`} /></td>) : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="CREDIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))}  id={`journalcredit${parseFloat(idx)+parseFloat(3)}`} name={`journalcredit${parseFloat(idx)+parseFloat(3)}`} /></td>) : thirteenth;
+                                                }
                                                 
                                                 first =table.rows[0].cells[0].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`}  name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : first;
                                                 second =table.rows[0].cells[1].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : second;
@@ -426,7 +485,9 @@ class JEModal extends React.Component{
                                                 nineth =table.rows[0].cells[8].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : nineth;
                                                 thenth =table.rows[0].cells[9].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : thenth;
                                                 twelve =table.rows[0].cells[10].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : thirteenth;
+                                                }
                                                 
                                                 first =table.rows[0].cells[0].innerHTML=="PAYEE"? (<td className="pt-3-half"  ><input type="text" className="w-100" list="customer_list_all" placeholder="Supplier/Customer" onKeyUp="addnewCustomerDatalist(this)" onChange="addnewCustomerDatalist(this)" id={`journalnamename${parseFloat(idx)+parseFloat(3)}`}  name={`journalnamename${parseFloat(idx)+parseFloat(3)}`}/></td>) : first;
                                                 second =table.rows[0].cells[1].innerHTML=="PAYEE"? (<td className="pt-3-half"  ><input type="text" className="w-100" list="customer_list_all" placeholder="Supplier/Customer" onKeyUp="addnewCustomerDatalist(this)" onChange="addnewCustomerDatalist(this)" id={`journalnamename${parseFloat(idx)+parseFloat(3)}`}  name={`journalnamename${parseFloat(idx)+parseFloat(3)}`} /></td>) : second;
@@ -439,7 +500,9 @@ class JEModal extends React.Component{
                                                 nineth =table.rows[0].cells[8].innerHTML=="PAYEE"? (<td className="pt-3-half"  ><input type="text" className="w-100" list="customer_list_all" placeholder="Supplier/Customer" onKeyUp="addnewCustomerDatalist(this)" onChange="addnewCustomerDatalist(this)" id={`journalnamename${parseFloat(idx)+parseFloat(3)}`}  name={`journalnamename${parseFloat(idx)+parseFloat(3)}`} /></td>) : nineth;
                                                 thenth =table.rows[0].cells[9].innerHTML=="PAYEE"? (<td className="pt-3-half"  ><input type="text" className="w-100" list="customer_list_all" placeholder="Supplier/Customer" onKeyUp="addnewCustomerDatalist(this)" onChange="addnewCustomerDatalist(this)" id={`journalnamename${parseFloat(idx)+parseFloat(3)}`}  name={`journalnamename${parseFloat(idx)+parseFloat(3)}`} /></td>) : thenth;
                                                 twelve =table.rows[0].cells[10].innerHTML=="PAYEE"? (<td className="pt-3-half"  ><input type="text" className="w-100" list="customer_list_all" placeholder="Supplier/Customer" onKeyUp="addnewCustomerDatalist(this)" onChange="addnewCustomerDatalist(this)" id={`journalnamename${parseFloat(idx)+parseFloat(3)}`}  name={`journalnamename${parseFloat(idx)+parseFloat(3)}`} /></td>) : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="PAYEE"? (<td className="pt-3-half"  ><input type="text" className="w-100" list="customer_list_all" placeholder="Supplier/Customer" onKeyUp="addnewCustomerDatalist(this)" onChange="addnewCustomerDatalist(this)" id={`journalnamename${parseFloat(idx)+parseFloat(3)}`}  name={`journalnamename${parseFloat(idx)+parseFloat(3)}`} /></td>) : thirteenth;
+                                                }
 
 
                                                 first =table.rows[0].cells[0].innerHTML=="CHEQUE NO"? (<td className="pt-3-half"  id=""><textarea id={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white'}}></textarea></td>) : first;
@@ -453,7 +516,9 @@ class JEModal extends React.Component{
                                                 nineth =table.rows[0].cells[8].innerHTML=="CHEQUE NO"? (<td className="pt-3-half"  id=""><textarea id={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`}  name={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white'}}></textarea></td>) : nineth;
                                                 thenth =table.rows[0].cells[9].innerHTML=="CHEQUE NO"? (<td className="pt-3-half"  id=""><textarea id={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`}  name={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white'}}></textarea></td>) : thenth;
                                                 twelve =table.rows[0].cells[10].innerHTML=="CHEQUE NO"? (<td className="pt-3-half"  id=""><textarea id={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`}  style={{width : '100%',border : '0px solid white'}}></textarea></td>) : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="CHEQUE NO"? (<td className="pt-3-half"  id=""><textarea id={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcheque_no_td${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white'}}></textarea></td>) : thirteenth;
+                                                }
 
                                                 first =table.rows[0].cells[0].innerHTML=="REFERENCE"? (<td className="pt-3-half"  ><textarea id={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`} name={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white'}}></textarea></td>) : first;
                                                 second =table.rows[0].cells[1].innerHTML=="REFERENCE"? (<td className="pt-3-half"  ><textarea id={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`}  name={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white'}}></textarea></td>) : second;
@@ -466,7 +531,9 @@ class JEModal extends React.Component{
                                                 nineth =table.rows[0].cells[8].innerHTML=="REFERENCE"? (<td className="pt-3-half"  ><textarea id={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`}  name={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`}style={{width : '100%',border : '0px solid white'}}></textarea></td>) : nineth;
                                                 thenth =table.rows[0].cells[9].innerHTML=="REFERENCE"? (<td className="pt-3-half"  ><textarea id={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`}  name={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`}style={{width : '100%',border : '0px solid white'}}></textarea></td>) : thenth;
                                                 twelve =table.rows[0].cells[10].innerHTML=="REFERENCE"? (<td className="pt-3-half"  ><textarea id={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`} name={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white'}}></textarea></td>) : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="REFERENCE"? (<td className="pt-3-half"  ><textarea id={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`} name={`journalref_no_td${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white'}}></textarea></td>) : thirteenth;
+                                                }
                                                 
                                                 first =table.rows[0].cells[0].innerHTML=="DATE DEPOSITED"? (<td className="pt-3-half"  ><input type="date" id={`date_deposited${parseFloat(idx)+parseFloat(3)}`} name={`date_deposited${parseFloat(idx)+parseFloat(3)}`} style={{height : 'unset'}} /></td>) : first;
                                                 second =table.rows[0].cells[1].innerHTML=="DATE DEPOSITED"? (<td className="pt-3-half"  ><input type="date" id={`date_deposited${parseFloat(idx)+parseFloat(3)}`} name={`date_deposited${parseFloat(idx)+parseFloat(3)}`} style={{height : 'unset'}} /></td>) : second;
@@ -479,20 +546,24 @@ class JEModal extends React.Component{
                                                 nineth =table.rows[0].cells[8].innerHTML=="DATE DEPOSITED"? (<td className="pt-3-half"  ><input type="date" id={`date_deposited${parseFloat(idx)+parseFloat(3)}`} name={`date_deposited${parseFloat(idx)+parseFloat(3)}`} style={{height : 'unset'}} /></td>) : nineth;
                                                 thenth =table.rows[0].cells[9].innerHTML=="DATE DEPOSITED"? (<td className="pt-3-half"  ><input type="date" id={`date_deposited${parseFloat(idx)+parseFloat(3)}`} name={`date_deposited${parseFloat(idx)+parseFloat(3)}`} style={{height : 'unset'}} /></td>) : thenth;
                                                 twelve =table.rows[0].cells[10].innerHTML=="DATE DEPOSITED"? (<td className="pt-3-half"  ><input type="date" id={`date_deposited${parseFloat(idx)+parseFloat(3)}`} name={`date_deposited${parseFloat(idx)+parseFloat(3)}`} style={{height : 'unset'}} /></td>) : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="DATE DEPOSITED"? (<td className="pt-3-half"  ><input type="date" id={`date_deposited${parseFloat(idx)+parseFloat(3)}`} name={`date_deposited${parseFloat(idx)+parseFloat(3)}`} style={{height : 'unset'}} /></td>) : thirteenth;
+                                                }
 
-                                                first =table.rows[0].cells[0].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : first;
-                                                second =table.rows[0].cells[1].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : second;
-                                                third =table.rows[0].cells[2].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : third;
-                                                fourth =table.rows[0].cells[3].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : fourth;
-                                                fifth =table.rows[0].cells[4].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : fifth;
-                                                sixth =table.rows[0].cells[5].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : sixth;
-                                                seventh =table.rows[0].cells[6].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : seventh;
-                                                eighth =table.rows[0].cells[7].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : eighth;
-                                                nineth =table.rows[0].cells[8].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : nineth;
-                                                thenth =table.rows[0].cells[9].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : thenth;
-                                                twelve =table.rows[0].cells[10].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}><div className="draggablepencilbutton" draggable="true">_________</div></td>) : twelve;
+                                                first =table.rows[0].cells[0].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : first;
+                                                second =table.rows[0].cells[1].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : second;
+                                                third =table.rows[0].cells[2].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : third;
+                                                fourth =table.rows[0].cells[3].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : fourth;
+                                                fifth =table.rows[0].cells[4].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : fifth;
+                                                sixth =table.rows[0].cells[5].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : sixth;
+                                                seventh =table.rows[0].cells[6].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : seventh;
+                                                eighth =table.rows[0].cells[7].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : eighth;
+                                                nineth =table.rows[0].cells[8].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : nineth;
+                                                thenth =table.rows[0].cells[9].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : thenth;
+                                                twelve =table.rows[0].cells[10].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : twelve;
+                                                if(this.props.JournalType=="ChequeVoucher"){
                                                 thirteenth =table.rows[0].cells[11].innerHTML==""? (<td className="pt-3-half text-center"  style={{position : 'relative'}}>{parseFloat(idx)+parseFloat(1)==this.state.rows.length? <a  href="#" id={`DeleteJournalRow${parseFloat(idx)+parseFloat(3)}`} onClick={()=> this.handleRemoveRow()}><span className="fa fa-trash"></span></a> : ''}<div className="draggablepencilbutton" draggable="true">_________</div></td>) : thirteenth;
+                                                }
                                                 
                                             return [
                                             <tr onMouseMove={()=>this.refreshselecpickerselects()} key={parseFloat(idx)+parseFloat(3)} id={`journalrow${parseFloat(idx)+parseFloat(3)}`} onDrag={(event)=>this.dragging(event,'journalrow'+(parseFloat(idx)+parseFloat(3)))} onDragOver={(event)=>this.setDefaultDraggfging(event)}>
@@ -555,18 +626,15 @@ class JEModal extends React.Component{
                                 <button type="button" style={{display : 'none'}} id="setselectpickerbutton"></button>
                                 <button type="button" style={{display : 'none'}} id="setselectpickerbuttonjournal_entry"></button>
                                 <button type="button" style={{display : 'none'}} id="setselectpickerbuttonjournal_entry_code"></button>
-                                <button type="button" style={{display : 'none'}} id="setselectpickerinvoicedebitcode"></button>
-                                <button type="button" style={{display : 'none'}} id="setselectpickerinvoicedebitcodecode"></button>
-                                <button type="button" style={{display : 'none'}} id="setselectpickerinvoicecredtitcode"></button>
-                                <button type="button" style={{display : 'none'}} id="setselectpickerinvoicecredtitcodecode"></button>
+                                
 
                                 <button type="button" style={{display : 'none'}} id="hideeightcolumn"></button>
                                 <button type="button" style={{display : 'none'}} id="showeightcolumn"></button>
 
                                 <button type="button" style={{display : 'none'}} id="destroydatatable"></button>
                                 <button type="button" style={{display : 'none'}} id="rerenderdatatable"></button>
-                                <button type="button" id="canceljournalentry" className="btn btn-secondary rounded" data-dismiss="modal">Cancel</button>
-                                <button className="btn btn-success rounded"  id="JournalEntrySaveButton" onClick="saveJournalEntry()">Save</button>
+                                <button type="button" id="canceljournalentry" className="btn btn-secondary rounded" data-dismiss="modal" onClick={()=>this.DeleteAllRows()}>Cancel</button>
+                                <button className="btn btn-success rounded"  id="JournalEntrySaveButton" type="submit">Save</button>
                             </div>
                             </form>
                         </div>

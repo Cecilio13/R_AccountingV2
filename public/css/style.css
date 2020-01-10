@@ -2470,6 +2470,7 @@ select[disabled] {
   p {
     margin-bottom:0px !important;
   }
+  
   									/* Absolute Center Spinner */
 .loading {
   position: fixed;
@@ -2742,4 +2743,34 @@ width: 100px !important;
 }
 tr.noBorder td {
 border: 0;
+}
+.removeReadOnly[readonly]{
+  background-color: white !important;
+}
+#excel-upload{
+  display: none;
+}
+#excel-upload-cc{
+    display: none;
+}
+.QuotationClass{
+  color:#a2aedb;
+}
+#excel-upload-budget{
+  display: none;
+}
+#excel-upload-bid{
+  display: none;
+}
+#excel-upload-customer{
+  display: none;
+}
+#excel-upload-supplier{
+  display: none;
+}
+#excel-uploadinvoice{
+  display: none;
+}
+.font-red{
+  color:red;
 }

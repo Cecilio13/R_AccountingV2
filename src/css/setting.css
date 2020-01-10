@@ -1,5 +1,5 @@
-p {
-    margin-bottom:20px;
+#myTabContent p {
+    margin-bottom:20px !important;
 }
 .half{
     width:45% !important;

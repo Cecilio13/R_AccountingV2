@@ -32,34 +32,7 @@ jQuery(document).ready(function($) {
 		return x1 + x2;
 	}
 	jQuery('.selectpicker').selectpicker;
-	$('.SettingsDiv select').prop('disabled', true);
-    $('.SettingsDiv input').prop('readonly', true);
-    console.log('input enabling');
-    $("#add_bank_form :input").prop("readonly", false);
-    $("#add_bank_form :input").prop("disabled", false);
-    $("#edit_bank_form :input").prop("readonly", false);
-	$("#edit_bank_form :input").prop("disabled", false);
-	$('#reset_default').on('click',function(event){
-		$('.SettingsDiv select').prop('disabled', true);
-		$('.SettingsDiv input').prop('readonly', true);
-		console.log('input enabling 222');
-		$("#add_bank_form :input").prop("readonly", false);
-		$("#add_bank_form :input").prop("disabled", false);
-		$("#edit_bank_form :input").prop("readonly", false);
-		$("#edit_bank_form :input").prop("disabled", false);
-	});
-	$('#company_form').on('submit',function(event){
-		$("#company_form :input").prop("readonly", false);
-	});
-	$('#sales_form').on('submit',function(event){
-		$("#sales_form :input").prop("disabled", false);
-	});
-	$('#expenses_form').on('submit',function(event){
-		$("#expenses_form :input").prop("disabled", false);
-	});
-	$('#advance_form').on('submit',function(event){
-		$("#advance_form :input").prop("disabled", false);
-	});
+	
 	
 	$('#SalesCheckbox').on('click',function(event){
 		if(document.getElementById("SalesCheckbox").checked){
@@ -111,6 +84,13 @@ jQuery(document).ready(function($) {
 			$('#sub_report_checkboxes :checkbox:enabled').prop('checked', true);
 		}
 	});
+	$('#rendertablejournallist').on('click',function(event){
+		
+	});
+	$('#rendertablecoalist').on('click',function(event){
+		
+	});
+	
 	var journalentrytable=$('#journalentrytable').DataTable({
 			paging: false,
 			"ordering": true,
@@ -126,11 +106,83 @@ jQuery(document).ready(function($) {
 		document.getElementById('journalentrytable_info').style.display="none";
 		document.getElementById('journalentrytable_filter').style.display="none";
 	}
+	var invoice_table;
+	$('#destroyinvoicetabledatatable').on('click',function(event){
+		$("#main_invoice_table").dataTable().fnDestroy();
+		$("#main_invoice_table_journal_account").dataTable().fnDestroy();
+	});
+	$('#rerenderbuttoninvoice').on('click',function(event){
+		invoice_table=$("#main_invoice_table").DataTable({
+			paging: false,
+			"ordering": true,
+			'dom': 'Rlfrtip',
+			"autoWidth": false,
+			rowReorder: true
+		});
+		
+		
+		
+		if(document.getElementById('main_invoice_table_info')){
+			document.getElementById('main_invoice_table_info').style.display="none";
+			document.getElementById('main_invoice_table_filter').style.display="none";
+			// var column = invoice_table.column(0);
+
+			// // Toggle the visibility
+			// column.visible( false );
+			invoice_table.on( 'row-reorder', function ( e, diff, edit ) {
+			//console.log("asdasdasd->>>> "+edit.triggerRow.data());
+			var result = 'Reorder started on row: '+(edit.triggerRow.data())+'<br>';
+			
+			for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
+				var rowData = invoice_table.row( diff[i].node ).data();
+				result += rowData;
+				console.log(rowData[0]);
+				//result += rowData[1]+' updated to be in position '+
+				//    diff[i].newData+' (was '+diff[i].oldData+')<br>';
+			}
+	
+		   // console.log( 'Event result:<br>'+result );
+		} );
+		}
+		var main_invoice_table_journal_account=$("#main_invoice_table_journal_account").DataTable({
+			paging: false,
+			"ordering": true,
+			'dom': 'Rlfrtip',
+			"autoWidth": false,
+			rowReorder: true
+		});
+		if(document.getElementById('main_invoice_table_journal_account_info')){
+			document.getElementById('main_invoice_table_journal_account_info').style.display="none";
+			document.getElementById('main_invoice_table_journal_account_filter').style.display="none";
+			// var column = invoice_table.column(0);
+
+			// // Toggle the visibility
+			// column.visible( false );
+			main_invoice_table_journal_account.on( 'row-reorder', function ( e, diff, edit ) {
+			//console.log("asdasdasd->>>> "+edit.triggerRow.data());
+			var result = 'Reorder started on row: '+(edit.triggerRow.data())+'<br>';
+			
+			for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
+				var rowData = main_invoice_table_journal_account.row( diff[i].node ).data();
+				result += rowData;
+				console.log(rowData[0]);
+				//result += rowData[1]+' updated to be in position '+
+				//    diff[i].newData+' (was '+diff[i].oldData+')<br>';
+			}
+	
+		   // console.log( 'Event result:<br>'+result );
+		} );
+		}
+	})
+	
 	$('#destroydatatable').on('click',function(event){
 		$("#journalentrytable").dataTable().fnDestroy();
 	});
+	
+	
 	$('#rerenderdatatable').on('click',function(event){
 		$("#journalentrytable").dataTable().fnDestroy();
+
 		journalentrytable=$("#journalentrytable").DataTable({
 			paging: false,
 			"ordering": true,
@@ -206,6 +258,11 @@ jQuery(document).ready(function($) {
 		  });
 		console.log('reset export buttons');
 		})
+	$('#coastcenterdivcoiasadsdweq').on('mouseenter',function(event){
+		console.log(document.getElementById('coa_ccedit'));
+		$('#coa_ccedit').selectpicker('refresh');
+		
+	})
 	$('#setselectpickerbuttonjournal_entry').on('click',function(event){
 		$('#accjournbale'+document.getElementById('setselectpickerbuttonjournal_entry').getAttribute('data-value')).selectpicker('refresh');
 		console.log(document.getElementById('setselectpickerbuttonjournal_entry').getAttribute('data-value'));
@@ -286,6 +343,13 @@ jQuery(document).ready(function($) {
 		console.log('refresh selectpicker');
 		//refreshpicjer();
 	})
+	$('#setselectpickerbuttoninvoice').on('click',function(event){
+		$('.selectpicker').selectpicker('refresh');
+		console.log('refresh selectpicker');
+		//refreshpicjer();
+	})
+	
+	
 	$('#destroyselectpickerbutton').on('click',function(event){
 		$("."+this.getAttribute('data-class')).selectpicker('destroy');
 		console.log(this.getAttribute('data-class'));
@@ -730,7 +794,7 @@ jQuery(document).ready(function($) {
 	$("#add_invoice_form").submit(function(event) {
 		event.preventDefault();
 		
-		$('#invoicemodal').modal('hide');
+		
 	});
 
 	$("#add_payment_form").submit(function(event) {
