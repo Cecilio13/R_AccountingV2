@@ -25,12 +25,16 @@ class JournalEntry extends React.Component{
         JE_NO_Preview : '',
         JournalMemopreview : '',
         journalDatepreview : '',
-        JournalType : 'ChequeVoucher',
+        JournalType : 'Cheque Voucher',
         journalvoucher_no : '',
         chequevoucher_no : '',
         current_date : '',
         jounalcount : '0',
         customers : [],
+        YearSelected : moment().format('YYYY'),
+        year_beg : '',
+        year_end : '',
+        yyyyy : '',
     }
     
     ooiienm= async (props) =>{
@@ -65,7 +69,8 @@ class JournalEntry extends React.Component{
         const response = await axios.get('http://localhost/Accounting_modified/public/api/getJournal_List',{
             params:{
                 keyword : keyword,
-                no : no
+                no : no,
+                year: this.state.YearSelected
             },
             crossDomain: true
         });
@@ -77,6 +82,11 @@ class JournalEntry extends React.Component{
         this.setState({JournalNoSelected : parseFloat(response.data.JournalNoSelected)+1});
         this.setState({saleeee : response.data.saleeee});
         this.setState({searchKeyword : response.data.keyword});
+        this.setState({STInvoice : response.data.STInvoice});
+        this.setState({year_beg : response.data.year_beg});
+        this.setState({year_end : response.data.year_end});
+        this.setState({yyyyy : response.data.yyyyy});
+        this.setState({YearSelected : response.data.yyyyy});
         document.getElementById('rendertablejournallist').click();
         
     }
@@ -173,13 +183,22 @@ class JournalEntry extends React.Component{
         window.location.reload();
     }
     showhide = (type) =>{
-        if(type=="ChequeVoucher"){
-            this.setState({JournalType : 'ChequeVoucher'});
+        if(type=="Cheque Voucher"){
+            this.setState({JournalType : 'Cheque Voucher'});
             document.getElementById('showeightcolumn').click();
         }else{
-            this.setState({JournalType : 'JournalVoucher'});
+            this.setState({JournalType : 'Journal Voucher'});
             document.getElementById('hideeightcolumn').click();
         }
+    }
+    createSelectItems() {
+        let items = [];         
+        for (let i = moment().format('YYYY'); i >=2019 ; i--) {             
+             items.push(<option key={i} value={i}>{i}</option>);   
+             //here I will be creating my options dynamically based on
+             //what props are currently passed to the parent component
+        }
+        return items;
     }
     render(){
         const journaltablelist=this.state.JournalEntry.map((dat,index) =>{
@@ -189,7 +208,7 @@ class JournalEntry extends React.Component{
                 <td style={{verticalAlign : 'middle'}}>{moment(dat.je_attachment).format('MM-DD-YYYY')}</td>
                 <td style={{verticalAlign : 'middle' , textAlign : 'center'}}>{dat.journal_type}</td>
                 <td style={{verticalAlign : 'middle' , textAlign : 'center'}}>
-                    
+                {dat.coa_code}
                 </td>
                 <td style={{verticalAlign : 'middle' , textAlign : 'center'}} ><a href="#" data-target="#journalentrymodalpreview" data-toggle="modal" onClick={()=>this.viewJournalEntryDetail(dat.je_no)} className="btn btn-link">{dat.je_series_no}</a></td>
                 <td style={{verticalAlign : 'middle'}} className={`${dat.je_debit!=""? 'DebitCell' : 'CreditCell'}`}>{dat.coa_name}</td>
@@ -322,9 +341,9 @@ class JournalEntry extends React.Component{
                                                     </div>
                                                 </div>
                                                 <div className="table-responsive-md">
-                                                <table className="table table-bordered text-left font14  table-sm" id="journalentrytablepreview">
+                                                <table className="table table-bordered table-light   text-left font14  table-sm" id="journalentrytablepreview">
                                                     <thead>
-                                                    <tr style={{backgroundColor : 'rgb(228, 236, 247)' , color: '#666'}}>
+                                                    <tr className="thead-light">
                                                         <th className="text-left" width="3%">#</th>
                                                         <th className="text-left" width="10%">CODE</th>
                                                         <th className="text-left" width="10%">ACCOUNT</th>
@@ -378,13 +397,25 @@ class JournalEntry extends React.Component{
                                 </div>
                             </div>
                             <div className="row" >
-                                <div className="col-md-12" >
+                                <div className="col-md-10" >
                                     <div className=" mr-2 mb-5 mt-3">
-                                        <a href="#" className="mr-1 btn btn-success" data-target='#journalentrymodal' onClick={()=> this.showhide('ChequeVoucher')} data-toggle="modal">Create New Cheque Voucher</a>
-                                        <a href="#" className="mr-1 btn btn-success" data-target='#journalentrymodal' onClick={()=> this.showhide('JournalVoucher')} data-toggle="modal">Create New Journal Voucher</a>
+                                        <a href="#" className="mr-1 btn btn-success" data-target='#journalentrymodal' onClick={()=> this.showhide('Cheque Voucher')} data-toggle="modal">Create New Cheque Voucher</a>
+                                        <a href="#" className="mr-1 btn btn-success" data-target='#journalentrymodal' onClick={()=> this.showhide('Journal Voucher')} data-toggle="modal">Create New Journal Voucher</a>
                                         <a href="#" className="mr-1 btn btn-success" data-target='#ImportJournalEntryModal' data-toggle="modal">Import Journal Entry</a>
                                         
                                     </div>
+                                </div>
+                                <div className="col-md-2">
+                                    <div class="input-group mb-3">
+                                        <input type="number" class="form-control" id="yearSSSEELLEECCRTTED" style={{float: 'right'}} value={this.state.YearSelected} onChange={(event)=>this.setState({YearSelected : event.target.value})} />
+                                        
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-secondary" onClick={()=>this.changePageNumber(0)}>GO</button>
+                                        </div>
+                                    </div>
+                                    {/* <select class="form-control" style={{float: 'right'}} value={this.state.YearSelected} onChange={(event)=>this.setState({YearSelected : event.target.value}, function() { this.changePageNumber(0)}.bind(this))}>
+                                        {this.createSelectItems()}
+                                    </select>  */}
                                 </div>
                             </div>
                             <div className="row" >

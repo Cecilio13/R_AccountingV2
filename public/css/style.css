@@ -2774,3 +2774,33 @@ border: 0;
 .font-red{
   color:red;
 }
+#sales_receipt_table input[readonly] {
+  border: 0 !important;
+  background-color: white !important;
+}
+#sales_receipt_table input[disabled] {
+  border: 0 !important;
+  background-color: white !important;
+}
+#sales_receipt_table select[disabled] {
+  border: 0 !important;
+  background-color: white !important;
+}
+#excel-uploadbill{
+  display: none;
+}
+.border-0{ 
+  border :0 !important;
+}
+.background-White[readonly]{
+  background-color: white !important;
+}
+.background-White[disabled]{
+  background-color: white !important;
+}
+.background-White{
+  background-color: white !important;
+}
+.borderRED{
+  border : red solid 1px;
+}

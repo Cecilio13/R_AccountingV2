@@ -49,6 +49,7 @@ class Accounting extends React.Component{
         this.getCOAInfo(this.state.searchKeyword,this.state.COANoSelected);
     }
     componentDidMount(){
+        
         this.getCOAInfo(this.state.searchKeyword,this.state.COANoSelected);
         
     }

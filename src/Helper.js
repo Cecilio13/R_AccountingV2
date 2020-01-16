@@ -35,4 +35,32 @@ export function addCommas(nStr) {
     }
     return x1 + x2;
 }
+export function PrintElem(elem){
+var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+if(elem=="printablereport_employee_contact_list"){
+   document.getElementById('report_main_above_button').style.display="none";
+}
+mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+mywindow.document.write('</head><body style="width:100%;">');
+//mywindow.document.write('<h1>' + document.title  + '</h1>');
+mywindow.document.write(document.getElementById(elem).innerHTML);
+mywindow.document.write('<style>');
+mywindow.document.write('.report-main{width:100%;}#tablemain{width:100%;border-spacing:0px;}#report_employee_companynameheader{border:0px solid black;}');
+mywindow.document.write('#tablemain th{border-top:1px solid #ccc;border-bottom:2px solid #ccc;}');
+mywindow.document.write('#tablemain tr td{border-bottom:1px solid #ccc;padding-left:0px;padding-right:0px;}');
+mywindow.document.write('</style>');
+mywindow.document.write('</body></html>');
+if(elem=="printablereport_employee_contact_list"){
+   document.getElementById('report_main_above_button').style.display="table-row";
+}
+
+
+mywindow.document.close(); // necessary for IE >= 10
+mywindow.focus(); // necessary for IE >= 10*/
+
+mywindow.print();
+mywindow.close();
+
+return true;
+}
 

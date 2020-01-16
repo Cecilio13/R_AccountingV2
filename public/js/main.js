@@ -107,10 +107,194 @@ jQuery(document).ready(function($) {
 		document.getElementById('journalentrytable_filter').style.display="none";
 	}
 	var invoice_table;
+	var estimate_table;
+	var credit_note_table;
+	var sales_receipt_table;
+	var sales_table;
+	var expensetable;
+	var bill_payment_table;
+	var table_pay_bills_modal_tabel;
+	var bill_account_table;
 	$('#destroyinvoicetabledatatable').on('click',function(event){
+		
 		$("#main_invoice_table").dataTable().fnDestroy();
 		$("#main_invoice_table_journal_account").dataTable().fnDestroy();
 	});
+	$('#destroyinvoicetabledatatable').on('click',function(event){
+		$("#sales_receipt_table").dataTable().fnDestroy();
+	});
+	
+	
+	$('#destroy_expense_table').on('click',function(event){
+		
+		$("#expensetable").dataTable().fnDestroy();
+	});
+	$('#refresh_expense_table').on('click',function(event){
+		expensetable = $('#expensetable').DataTable({
+            order: [[ 1, "desc" ]],
+            
+        });
+		
+	});
+	$('#destroy_pay_bills_table').on('click',function(event){
+		if ( ! $.fn.DataTable.isDataTable( '#bill_payment_table' ) ) {
+			$("#bill_payment_table").dataTable().fnDestroy();
+		}
+		
+	});
+	$('#refresh_pay_bills_table').on('click',function(event){
+		if(document.getElementById('bill_payment_table')){
+            bill_payment_table = $('#bill_payment_table').DataTable({
+            order: [[ 0, "desc" ]],
+            
+            });
+        }
+		
+	});
+	
+	$('#destroybilltabledatatable').on('click',function(event){
+		$("#bill_account_table").dataTable().fnDestroy();
+		
+		
+	});
+	$('#destroy_pay_bills_modal').on('click',function(event){
+		if ( ! $.fn.DataTable.isDataTable( '#table_pay_bills_modal_tabel' ) ) {
+			$("#table_pay_bills_modal_tabel").dataTable().fnDestroy();
+		}
+		
+	});
+	$('#refresh_pay_bills_modal').on('click',function(event){
+		if(document.getElementById('table_pay_bills_modal_tabel')){
+            table_pay_bills_modal_tabel = $('#table_pay_bills_modal_tabel').DataTable({
+            order: [[ 9, "desc" ]],
+            paging: false,
+            "ordering": true,
+            'dom': 'Rlfrtip',
+            "autoWidth": false,
+            rowReorder: true
+            });
+            table_pay_bills_modal_tabel.on( 'row-reorder', function ( e, diff, edit ) {
+                //console.log("asdasdasd->>>> "+edit.triggerRow.data());
+                var result = 'Reorder started on row: '+(edit.triggerRow.data())+'<br>';
+                
+                for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
+                    var rowData = table_pay_bills_modal_tabel.row( diff[i].node ).data();
+                    result += rowData;
+                    console.log(rowData[0]);
+                    //result += rowData[1]+' updated to be in position '+
+                    //    diff[i].newData+' (was '+diff[i].oldData+')<br>';
+                }
+            });
+        }
+	});
+	$('#add_supplier_credit_form').on('submit',function(event){
+		$("#add_supplier_credit_form :input").prop("disabled", false);
+	});
+	$('#disable_supplier_credit_form_input').on('click',function(event){
+		console.log('disabled supplier credit inputs');
+		$("#add_supplier_credit_form :input").prop("disabled", true);
+	});
+	
+	$('#destroy_sales_table').on('click',function(event){
+		$("#salestable").dataTable().fnDestroy();
+	});
+	$('#refresh_sales_table').on('click',function(event){
+		sales_table = $('#salestable').DataTable({
+			paging: true,
+			order: [[ 0, "desc" ]],
+			
+		});
+		if( document.getElementById('salestable_info')){
+			document.getElementById('salestable_info').style.display="none";
+		}
+		
+	});
+	
+	$('#destroyestimatetabledatatable').on('click',function(event){
+		$("#estimate_table").dataTable().fnDestroy();
+		
+	});
+	$('#destroycreditnotetabledatatable').on('click',function(event){
+		$("#credit_note_table").dataTable().fnDestroy();
+		
+	});
+	
+	$('#rerenderbuttoncreditnote').on('click',function(event){
+		
+		credit_note_table=$("#credit_note_table").DataTable({
+			paging: false,
+			"ordering": true,
+			'dom': 'Rlfrtip',
+			"autoWidth": false,
+			rowReorder: true
+		});
+		
+		if(document.getElementById('credit_note_table_info')){
+			document.getElementById('credit_note_table_info').style.display="none";
+			document.getElementById('credit_note_table_filter').style.display="none";
+			
+			credit_note_table.on( 'row-reorder', function ( e, diff, edit ) {
+			var result = 'Reorder started on row: '+(edit.triggerRow.data())+'<br>';
+			
+			for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
+				var rowData = credit_note_table.row( diff[i].node ).data();
+				result += rowData;
+				console.log(rowData[0]);
+				//result += rowData[1]+' updated to be in position '+
+				//    diff[i].newData+' (was '+diff[i].oldData+')<br>';
+			}
+			});
+		}
+		
+	})
+	$('#rerenderbuttonestimate').on('click',function(event){
+		estimate_table=$("#estimate_table").DataTable({
+			paging: false,
+			"ordering": true,
+			'dom': 'Rlfrtip',
+			"autoWidth": false,
+			rowReorder: true
+		});
+		
+		
+		
+		if(document.getElementById('estimate_table_info')){
+			document.getElementById('estimate_table_info').style.display="none";
+			document.getElementById('estimate_table_filter').style.display="none";
+			estimate_table.on( 'row-reorder', function ( e, diff, edit ) {
+			//console.log("asdasdasd->>>> "+edit.triggerRow.data());
+			var result = 'Reorder started on row: '+(edit.triggerRow.data())+'<br>';
+			
+			for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
+				var rowData = estimate_table.row( diff[i].node ).data();
+				result += rowData;
+				console.log(rowData[0]);
+				//result += rowData[1]+' updated to be in position '+
+				//    diff[i].newData+' (was '+diff[i].oldData+')<br>';
+			}
+			});
+		}
+		
+	})
+	
+	$('#rerenderbuttonsalesreceipt').on('click',function(event){
+		// sales_receipt_table=$("#sales_receipt_table").DataTable({
+		// 	paging: false,
+		// 	"ordering": true,
+		// 	'dom': 'Rlfrtip',
+		// 	"autoWidth": false,
+		// 	rowReorder: true
+		// });
+		
+		
+		
+		// if(document.getElementById('sales_receipt_table_info')){
+		// 	document.getElementById('sales_receipt_table_info').style.display="none";
+		// 	document.getElementById('sales_receipt_table_filter').style.display="none";
+			
+		// }
+		
+	})
 	$('#rerenderbuttoninvoice').on('click',function(event){
 		invoice_table=$("#main_invoice_table").DataTable({
 			paging: false,
@@ -174,12 +358,50 @@ jQuery(document).ready(function($) {
 		} );
 		}
 	})
+	$('#estimatetoinvoicebtn').on('click',function(event){
+		$('#invoicecustomer').selectpicker('refresh');
+		$('.select_product_name').selectpicker('refresh');
+		
+		
+	});
+	$('#bill_modal_refreshbtn').on('click',function(event){
+		$('.bill_account_select').selectpicker('refresh');
+	});
+	
+	$('#cashaccount_select').on('click',function(event){
+		$('.cashaccount_select').selectpicker('refresh');
+	});
 	
 	$('#destroydatatable').on('click',function(event){
 		$("#journalentrytable").dataTable().fnDestroy();
 	});
 	
-	
+	$('#rerenderselectpickerbill').on('click',function(event){
+		
+		bill_account_table=$("#bill_account_table").DataTable({
+			paging: false,
+			"ordering": true,
+			'dom': 'Rlfrtip',
+			"autoWidth": false,
+			rowReorder: true
+		});
+		if(document.getElementById('bill_account_table_info')){
+			document.getElementById('bill_account_table_info').style.display="none";
+			document.getElementById('bill_account_table_filter').style.display="none";
+			bill_account_table.on( 'row-reorder', function ( e, diff, edit ) {
+			//console.log("asdasdasd->>>> "+edit.triggerRow.data());
+			var result = 'Reorder started on row: '+(edit.triggerRow.data())+'<br>';
+			
+			for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
+				var rowData = bill_account_table.row( diff[i].node ).data();
+				result += rowData;
+				console.log(rowData[0]);
+				//result += rowData[1]+' updated to be in position '+
+				//    diff[i].newData+' (was '+diff[i].oldData+')<br>';
+			}
+			});
+		}
+	});
 	$('#rerenderdatatable').on('click',function(event){
 		$("#journalentrytable").dataTable().fnDestroy();
 
@@ -206,7 +428,15 @@ jQuery(document).ready(function($) {
 				//    diff[i].newData+' (was '+diff[i].oldData+')<br>';
 			}
 			});
+			if(document.getElementById('journal_entry_type').value=="Cheque Voucher"){
+				var column = journalentrytable.column( 8 );
+				column.visible( true );
+			}else{
+				var column = journalentrytable.column( 8 );
+				column.visible( false );
+			}
 		}
+
 	});
 	$('#showeightcolumn').on('click',function(event){
 		var column = journalentrytable.column( 8 );
@@ -348,7 +578,11 @@ jQuery(document).ready(function($) {
 		console.log('refresh selectpicker');
 		//refreshpicjer();
 	})
-	
+	$('#setselectpickerbuttonestimate').on('click',function(event){
+		$('.selectpicker').selectpicker('refresh');
+		console.log('refresh selectpicker');
+		//refreshpicjer();
+	})
 	
 	$('#destroyselectpickerbutton').on('click',function(event){
 		$("."+this.getAttribute('data-class')).selectpicker('destroy');
@@ -360,6 +594,12 @@ jQuery(document).ready(function($) {
 		console.log('render selectpicker');
 		//render_select_picker();
 	})
+	$('#setselectpickerbuttoncreditnote').on('click',function(event){
+		$('.selectpicker').selectpicker('render');
+		console.log('render selectpicker');
+		//render_select_picker();
+	})
+	
 	$('#openmodalbtndynamically').on('click',function(event){
 		$("#"+this.getAttribute('data-id')).modal()
 		//render_select_picker();
@@ -806,13 +1046,11 @@ jQuery(document).ready(function($) {
 	$("#add_estimate_form").submit(function(event) {
 		event.preventDefault();
 		
-		$('#estimatemodal').modal('hide');
 	});
 
 	$("#add_sales_receipt_form").submit(function(event) {
 		event.preventDefault();
 		
-		$('#salesreceiptmodal').modal('hide');
 	});
 
 	$("#add_refund_receipt_form").submit(function(event) {
@@ -836,7 +1074,6 @@ jQuery(document).ready(function($) {
 	$("#add_credit_note_form").submit(function(event) {
 		event.preventDefault();
 		
-		$('#creditnotemodal').modal('hide');
 	});
 
 	$("#add_expense_form").submit(function(event) {
@@ -854,19 +1091,12 @@ jQuery(document).ready(function($) {
 	$("#add_bill_form").submit(function(event) {
 		event.preventDefault();
 		
-		$('#billmodal').modal('hide');
 	});
 
 	$("#add_purchase_order_form").submit(function(event) {
 		event.preventDefault();
 		
 		$('#purchaseordermodal').modal('hide');
-	});
-
-	$("#add_supplier_credit_form").submit(function(event) {
-		event.preventDefault();
-		
-		$('#suppliercreditmodal').modal('hide');
 	});
 
 	$("#add_card_credit_form").submit(function(event) {

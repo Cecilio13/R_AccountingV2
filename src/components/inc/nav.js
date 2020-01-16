@@ -4,6 +4,18 @@ import axios from 'axios';
 import '../../css/index.css';
 
 class Nav extends React.Component{
+    constructor() {
+        super();
+        let data = sessionStorage.getItem('Accounting_App_Logged');
+        console.log("LOGGED :"+data);
+        if(data=="1"){
+            console.log('Logged In');
+            
+        }else{
+            console.log('need to log in first from inside');
+            window.location.href=".";
+        }
+    }
     state ={data: []}
    
 
@@ -31,14 +43,12 @@ class Nav extends React.Component{
                 <div className="col-sm-5">
                     <div className="user-area dropdown float-right">
                         <a href="#" className="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img className="user-avatar rounded-circle" src="images/customers.png" alt="User Avatar" />
+                        <img className="user-avatar rounded-circle" src={process.env.PUBLIC_URL + '/images/customers.png'} alt="User Avatar" />
                         </a>
                         <div className="user-menu dropdown-menu">
-                            <a className="nav-link" href="#"><i className="far fa-user"></i> Username</a>
-                            <a className="nav-link" href="#" ><i className="fa fa-power-off"></i> Sign Out</a>
-                            <form id="logout-form" action="" method="POST" style={{display : 'none'}}>
-                                
-                            </form>
+                            <a className="nav-link" href="#"><i className="far fa-user"></i> {sessionStorage.getItem('Accounting_App_name')}</a>
+                            <a className="nav-link" href="#" onClick={()=>(sessionStorage.setItem('Accounting_App_Logged', '0'),sessionStorage.setItem('Accounting_App_email', ''),sessionStorage.setItem('Accounting_App_name', ''),sessionStorage.setItem('Accounting_App_position', ''),window.location.href=".")}><i className="fa fa-power-off"></i> Sign Out</a>
+                            
                         </div>
                         <div className="modal fade float-right" id="staticModal" tabIndex="-1" role="dialog" aria-labelledby="staticModalLabel" aria-hidden="true" data-backdrop="false">
                             <div className="modal-dialog modal-sm float-right w-100" style={{marginTop : '75px'}} role="document">

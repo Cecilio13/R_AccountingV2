@@ -24,9 +24,19 @@ import AccountAndSettings from '../AccountAndSettings.js';
 import CustomFontStyles from '../CustomFontStyles.js';
 import AllList from '../AllList.js';
 import Dashboard from '../Dashboard.js';
+import Report_Content from '../Report_Content.js';
+import Report_Content_A from '../Report_Content_A.js';
+import Report_Content_B from '../Report_Content_B.js';
+import Report_Content_CC from '../Report_Content_CC.js';
+import Report_Content_SC from '../Report_Content_SC.js';
+import Report_Content_P from '../Report_Content_P.js';
+import Report_Content_ACC from '../Report_Content_ACC.js';
+import Report_Content_Recent from '../Report_Content_Recent.js';
+import Report_Content_J from '../Report_Content_J.js';
 
 const RouteController = () => (
-    <Router>
+    
+    <Router basename="/react">
         <div>
             <Switch>
                 <Route path="/dashboard">
@@ -40,7 +50,15 @@ const RouteController = () => (
                 </Route>
                 <Route path="/journalentry/:je_no?/:style?" component={JournalEntry} />
                 <Route path="/print_journal_entry/:no?" component={print_journal} />
-                
+                <Route path="/report_content/:no" component={Report_Content} />
+                <Route path="/report_content_a" component={Report_Content_A} />
+                <Route path="/report_content_b" component={Report_Content_B} />
+                <Route path="/report_content_cc" component={Report_Content_CC} />
+                <Route path="/report_content_sc" component={Report_Content_SC} />
+                <Route path="/report_content_p" component={Report_Content_P} />
+                <Route path="/report_content_acc" component={Report_Content_ACC} />
+                <Route path="/report_content_recent" component={Report_Content_Recent} />
+                <Route path="/report_content_j" component={Report_Content_J} />
                 <Route path="/sales">
                     <Sales />
                 </Route>
