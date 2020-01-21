@@ -1068,6 +1068,10 @@ class Modal extends React.Component{
                             <select style={{border: '0', width : "100%"}} value={dat.et_ad_product} class="sc_data account_select_sc form-control" disabled id={`select_account_sc${row_count}`} name={`select_account_sc${row_count}`} ><option value="">--Select Account--</option>{COA_list}</select>
                             </td>
                             <td style={{verticalAlign : 'middle'}}>
+                            
+                            <select style={{border: '0', width : "100%"}} value={dat.et_cost_center} class="sc_data  form-control" disabled id={`select_costcenter_sc${row_count}`} name={`select_costcenter_sc${row_count}`} ><option value="">--Select Cost Center--</option>{cost_center_list}</select>
+                            </td>
+                            <td style={{verticalAlign : 'middle'}}>
                                 <input class="sc_data description_select_sc form-control" value={dat.et_ad_desc} disabled name={`select_description_sc${row_count}`} id={`select_description_sc${row_count}`}  style={{border : '0'}} />
                             </td>
                             <td style={{verticalAlign : 'middle'}}>
@@ -1085,13 +1089,17 @@ class Modal extends React.Component{
                             </td>
                             <td style={{verticalAlign : 'middle'}}>{row_count}</td>
                             <td style={{verticalAlign : 'middle'}}>
-                            <select style={{border: '0', width : "100%"}} class="sc_data account_select_sc form-control" disabled name={`select_account_sc${row_count}`} id={`select_account_sc${row_count}`} ><option value="">--Select Account--</option>{COA_list}</select>
+                            <select style={{border: '0', width : "100%"}} value={dat.et_ad_product} class="sc_data account_select_sc form-control" disabled name={`select_account_sc${row_count}`} id={`select_account_sc${row_count}`} ><option value="">--Select Account--</option>{COA_list}</select>
                             </td>
                             <td style={{verticalAlign : 'middle'}}>
-                                <input class="sc_data description_select_sc form-control" disabled id={`select_description_sc${row_count}`} name={`select_description_sc${row_count}`}  style={{border : '0'}} />
+                            
+                            <select style={{border: '0', width : "100%"}} value={dat.et_cost_center} class="sc_data  form-control" disabled id={`select_costcenter_sc${row_count}`} name={`select_costcenter_sc${row_count}`} ><option value="">--Select Account--</option>{cost_center_list}</select>
                             </td>
                             <td style={{verticalAlign : 'middle'}}>
-                                <input type="number" step="0.01" disabled class="sc_data amount_select_sc form-control" id={`select_sc_amount${row_count}`} name={`select_sc_amount${row_count}`} style={{border :'0', textAlign : 'right'}} />
+                                <input class="sc_data description_select_sc form-control" value={dat.et_ad_desc} disabled id={`select_description_sc${row_count}`} name={`select_description_sc${row_count}`}  style={{border : '0'}} />
+                            </td>
+                            <td style={{verticalAlign : 'middle'}}>
+                                <input type="number" step="0.01" value={dat.et_ad_total}  disabled class="sc_data amount_select_sc form-control" id={`select_sc_amount${row_count}`} name={`select_sc_amount${row_count}`} style={{border :'0', textAlign : 'right'}} />
                             </td>
                         </tr>
                     ]
@@ -1204,6 +1212,7 @@ class Modal extends React.Component{
                                             <tr>
                                                 <th class="text-left" width="5%">#</th>
                                                 <th class="text-left" width="20%">ACCOUNT</th>
+                                                <th class="text-left" width="20%">COST CENTER</th>
                                                 <th class="text-left" width="">DESCRIPTION</th>
                                                 <th class="text-left" width="20%">AMOUNT</th>
                                                 <th class="text-center" width="5%"></th>
@@ -1222,6 +1231,7 @@ class Modal extends React.Component{
                                                 var c ="";
                                                 var d ="";
                                                 var e ="";
+                                                var f ="";
                                                 
                                                 
                                                 var table = document.getElementById("bill_account_table");
@@ -1230,30 +1240,42 @@ class Modal extends React.Component{
                                                 c =table.rows[0].cells[2].innerHTML=="#"? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)}</td> : c;
                                                 d =table.rows[0].cells[3].innerHTML=="#"? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)}</td> : d;
                                                 e =table.rows[0].cells[4].innerHTML=="#"? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)}</td> : e;
+                                                f =table.rows[0].cells[5].innerHTML=="#"? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)}</td> : e;
                                                 
                                                 a =table.rows[0].cells[0].innerHTML=="ACCOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_account_select selectpicker" data-live-search="true" name={`select_account_bill${row_count}`} id={`select_account_bill${row_count}`}><option value="">--Select Account--</option>{COA_list}</select></td> : a;
                                                 b =table.rows[0].cells[1].innerHTML=="ACCOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_account_select selectpicker" data-live-search="true" name={`select_account_bill${row_count}`} id={`select_account_bill${row_count}`}><option value="">--Select Account--</option>{COA_list}</select></td> : b;
                                                 c =table.rows[0].cells[2].innerHTML=="ACCOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_account_select selectpicker" data-live-search="true" name={`select_account_bill${row_count}`} id={`select_account_bill${row_count}`}><option value="">--Select Account--</option>{COA_list}</select></td> : c;
                                                 d =table.rows[0].cells[3].innerHTML=="ACCOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_account_select selectpicker" data-live-search="true" name={`select_account_bill${row_count}`} id={`select_account_bill${row_count}`}><option value="">--Select Account--</option>{COA_list}</select></td> : d;
                                                 e =table.rows[0].cells[4].innerHTML=="ACCOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_account_select selectpicker" data-live-search="true" name={`select_account_bill${row_count}`} id={`select_account_bill${row_count}`}><option value="">--Select Account--</option>{COA_list}</select></td> : e;
+                                                f =table.rows[0].cells[5].innerHTML=="ACCOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_account_select selectpicker" data-live-search="true" name={`select_account_bill${row_count}`} id={`select_account_bill${row_count}`}><option value="">--Select Account--</option>{COA_list}</select></td> : e;
+
+                                                a =table.rows[0].cells[0].innerHTML=="COST CENTER"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_cost_center_select selectpicker" data-live-search="true" name={`select_cost_center_bill${row_count}`} id={`select_cost_center_bill${row_count}`}><option value="">--Select Account--</option>{cost_center_list}</select></td> : a;
+                                                b =table.rows[0].cells[1].innerHTML=="COST CENTER"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_cost_center_select selectpicker" data-live-search="true" name={`select_cost_center_bill${row_count}`} id={`select_cost_center_bill${row_count}`}><option value="">--Select Account--</option>{cost_center_list}</select></td> : b;
+                                                c =table.rows[0].cells[2].innerHTML=="COST CENTER"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_cost_center_select selectpicker" data-live-search="true" name={`select_cost_center_bill${row_count}`} id={`select_cost_center_bill${row_count}`}><option value="">--Select Account--</option>{cost_center_list}</select></td> : c;
+                                                d =table.rows[0].cells[3].innerHTML=="COST CENTER"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_cost_center_select selectpicker" data-live-search="true" name={`select_cost_center_bill${row_count}`} id={`select_cost_center_bill${row_count}`}><option value="">--Select Account--</option>{cost_center_list}</select></td> : d;
+                                                e =table.rows[0].cells[4].innerHTML=="COST CENTER"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_cost_center_select selectpicker" data-live-search="true" name={`select_cost_center_bill${row_count}`} id={`select_cost_center_bill${row_count}`}><option value="">--Select Account--</option>{cost_center_list}</select></td> : e;
+                                                f =table.rows[0].cells[5].innerHTML=="COST CENTER"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><select style={{border : '0', width : '100%'}} class="form-control bill_cost_center_select selectpicker" data-live-search="true" name={`select_cost_center_bill${row_count}`} id={`select_cost_center_bill${row_count}`}><option value="">--Select Account--</option>{cost_center_list}</select></td> : e;
 
                                                 a =table.rows[0].cells[0].innerHTML=="DESCRIPTION"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input class="bill_data description_select_bill form-control" id={`select_description_bill${row_count}`} name={`select_description_bill${row_count}`} style={{border : '0'}} /></td> : a;
                                                 b =table.rows[0].cells[1].innerHTML=="DESCRIPTION"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input class="bill_data description_select_bill form-control" id={`select_description_bill${row_count}`} name={`select_description_bill${row_count}`} style={{border : '0'}} /></td> : b;
                                                 c =table.rows[0].cells[2].innerHTML=="DESCRIPTION"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input class="bill_data description_select_bill form-control" id={`select_description_bill${row_count}`} name={`select_description_bill${row_count}`} style={{border : '0'}} /></td> : c;
                                                 d =table.rows[0].cells[3].innerHTML=="DESCRIPTION"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input class="bill_data description_select_bill form-control" id={`select_description_bill${row_count}`} name={`select_description_bill${row_count}`} style={{border : '0'}} /></td> : d;
                                                 e =table.rows[0].cells[4].innerHTML=="DESCRIPTION"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input class="bill_data description_select_bill form-control" id={`select_description_bill${row_count}`} name={`select_description_bill${row_count}`} style={{border : '0'}} /></td> : e;
+                                                f =table.rows[0].cells[5].innerHTML=="DESCRIPTION"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input class="bill_data description_select_bill form-control" id={`select_description_bill${row_count}`} name={`select_description_bill${row_count}`} style={{border : '0'}} /></td> : e;
 
                                                 a =table.rows[0].cells[0].innerHTML=="AMOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input type="text" class="form-control" id={`unformated_select_bill_amount${row_count}`} style={{border : '0', textAlign : 'right'}} defaultValue="0.00" onChange={(event)=>this.maskamountinputsales_receipt(row_count,'unformated_select_bill_amount','select_bill_amount')} /><input type="hidden" class="bill_data amount_select_bill"  id={`select_bill_amount${row_count}`}  name={`select_bill_amount${row_count}`} style={{textAlign : 'center', border :'0'}} /></td> : a;
                                                 b =table.rows[0].cells[1].innerHTML=="AMOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input type="text" class="form-control" id={`unformated_select_bill_amount${row_count}`} style={{border : '0', textAlign : 'right'}} defaultValue="0.00" onChange={(event)=>this.maskamountinputsales_receipt(row_count,'unformated_select_bill_amount','select_bill_amount')} /><input type="hidden" class="bill_data amount_select_bill"  id={`select_bill_amount${row_count}`}  name={`select_bill_amount${row_count}`} style={{textAlign : 'center', border :'0'}} /></td> : b;
                                                 c =table.rows[0].cells[2].innerHTML=="AMOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input type="text" class="form-control" id={`unformated_select_bill_amount${row_count}`} style={{border : '0', textAlign : 'right'}} defaultValue="0.00" onChange={(event)=>this.maskamountinputsales_receipt(row_count,'unformated_select_bill_amount','select_bill_amount')} /><input type="hidden" class="bill_data amount_select_bill"  id={`select_bill_amount${row_count}`}  name={`select_bill_amount${row_count}`} style={{textAlign : 'center', border :'0'}} /></td> : c;
                                                 d =table.rows[0].cells[3].innerHTML=="AMOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input type="text" class="form-control" id={`unformated_select_bill_amount${row_count}`} style={{border : '0', textAlign : 'right'}} defaultValue="0.00" onChange={(event)=>this.maskamountinputsales_receipt(row_count,'unformated_select_bill_amount','select_bill_amount')} /><input type="hidden" class="bill_data amount_select_bill"  id={`select_bill_amount${row_count}`}  name={`select_bill_amount${row_count}`} style={{textAlign : 'center', border :'0'}} /></td> : d;
                                                 e =table.rows[0].cells[4].innerHTML=="AMOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input type="text" class="form-control" id={`unformated_select_bill_amount${row_count}`} style={{border : '0', textAlign : 'right'}} defaultValue="0.00" onChange={(event)=>this.maskamountinputsales_receipt(row_count,'unformated_select_bill_amount','select_bill_amount')} /><input type="hidden" class="bill_data amount_select_bill"  id={`select_bill_amount${row_count}`}  name={`select_bill_amount${row_count}`} style={{textAlign : 'center', border :'0'}} /></td> : e;
+                                                f =table.rows[0].cells[5].innerHTML=="AMOUNT"? <td style={{verticalAlign :'middle',textAlign : 'center'}}><input type="text" class="form-control" id={`unformated_select_bill_amount${row_count}`} style={{border : '0', textAlign : 'right'}} defaultValue="0.00" onChange={(event)=>this.maskamountinputsales_receipt(row_count,'unformated_select_bill_amount','select_bill_amount')} /><input type="hidden" class="bill_data amount_select_bill"  id={`select_bill_amount${row_count}`}  name={`select_bill_amount${row_count}`} style={{textAlign : 'center', border :'0'}} /></td> : e;
 
                                                 a =table.rows[0].cells[0].innerHTML==""? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)==this.state.bill_table_row.length?<a href="#" onClick={()=>this.deleteItemebill(idx)}   id={`delete_account_bill${parseFloat(idx)+parseFloat(1)}`} ><span class="fa fa-trash delete_account_bill"></span></a> : '' }</td> : a;
                                                 b =table.rows[0].cells[1].innerHTML==""? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)==this.state.bill_table_row.length?<a href="#" onClick={()=>this.deleteItemebill(idx)}   id={`delete_account_bill${parseFloat(idx)+parseFloat(1)}`} ><span class="fa fa-trash delete_account_bill"></span></a> : '' }</td> : b;
                                                 c =table.rows[0].cells[2].innerHTML==""? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)==this.state.bill_table_row.length?<a href="#" onClick={()=>this.deleteItemebill(idx)}   id={`delete_account_bill${parseFloat(idx)+parseFloat(1)}`} ><span class="fa fa-trash delete_account_bill"></span></a> : '' }</td> : c;
                                                 d =table.rows[0].cells[3].innerHTML==""? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)==this.state.bill_table_row.length?<a href="#" onClick={()=>this.deleteItemebill(idx)}   id={`delete_account_bill${parseFloat(idx)+parseFloat(1)}`} ><span class="fa fa-trash delete_account_bill"></span></a> : '' }</td> : d;
                                                 e =table.rows[0].cells[4].innerHTML==""? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)==this.state.bill_table_row.length?<a href="#" onClick={()=>this.deleteItemebill(idx)}   id={`delete_account_bill${parseFloat(idx)+parseFloat(1)}`} ><span class="fa fa-trash delete_account_bill"></span></a> : '' }</td> : e;
+                                                f =table.rows[0].cells[5].innerHTML==""? <td style={{verticalAlign :'middle',textAlign : 'center'}}>{parseFloat(idx)+parseFloat(1)==this.state.bill_table_row.length?<a href="#" onClick={()=>this.deleteItemebill(idx)}   id={`delete_account_bill${parseFloat(idx)+parseFloat(1)}`} ><span class="fa fa-trash delete_account_bill"></span></a> : '' }</td> : e;
 
                                                 return[
                                                     <tr key={idx} onMouseOver={this.rerenderselectpickerbill}>
@@ -1262,7 +1284,7 @@ class Modal extends React.Component{
                                                     {c}
                                                     {d}
                                                     {e}
-                                                    
+                                                    {f}
                                                     </tr>
                                                 ]
                                             })}
@@ -1404,7 +1426,8 @@ class Modal extends React.Component{
                                         <tr>
                                             <th width="3%" class="text-center"></th>
                                             <th width="4%" class="text-left">#</th>
-                                            <th width="37%" class="text-left">ACCOUNT</th>
+                                            <th width="20%" class="text-left">ACCOUNT</th>
+                                            <th width="20%" class="text-left">COST CENTER</th>
                                             <th width="40%" class="text-left">DESCRIPTION</th>
                                             <th width="20%" class="text-left">AMOUNT</th>
                                         </tr>

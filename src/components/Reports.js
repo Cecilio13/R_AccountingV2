@@ -139,12 +139,7 @@ class Reports extends React.Component{
                                                 <tr>
                                                     <td style={{verticalAlign : 'middle'}} colspan="2"><Link className="btn btn-link" to={`report_content_a`}>Audit Log</Link></td>
                                                 </tr>
-                                                <tr>
-                                                    <td style={{verticalAlign : 'middle'}} ><Link className="btn btn-link" to={`report_content_b`}>Budget Summary Report</Link></td>
-                                                    <td style={{verticalAlign : 'middle'}}>
-                                                        
-                                                    </td>
-                                                </tr>
+                                               
                                                 <tr>
                                                     <td style={{verticalAlign : 'middle'}} ><Link className="btn btn-link" to={`report_content/BalanceSheetComparisonByDate`}>Balance Sheet Comparison</Link></td>
                                                     <td style={{verticalAlign : 'middle'}}>
@@ -170,7 +165,12 @@ class Reports extends React.Component{
                                     <div className="col-md-5">
                                         <table className="table table-hover table-sm table-report" >
                                             <tbody >
-                                                
+                                                <tr>
+                                                    <td style={{verticalAlign : 'middle'}} ><Link className="btn btn-link" to={`report_content_b`}>Budget Summary Report</Link></td>
+                                                    <td style={{verticalAlign : 'middle'}}>
+                                                        
+                                                    </td>
+                                                </tr>
                                                 <tr>
                                                     <td style={{verticalAlign : 'middle'}} ><Link className="btn btn-link" to={`report_content/ProfitandlossByDate`}>Profit and Loss</Link></td>
                                                     <td style={{verticalAlign : 'middle'}}>

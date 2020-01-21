@@ -72,11 +72,14 @@ class JEModal extends React.Component{
             },
             crossDomain: true
         });
-        document.getElementById('journalcost_center_td'+row).innerHTML=response.data.name;
-        document.getElementById('journalcost_center_td_input'+row).value=response.data.no;
+        document.getElementById('journalcost_center_td'+row).value=response.data.no!=null? response.data.no : '';
+        document.getElementById('journalcost_center_td_input'+row).value=response.data.no!=null? response.data.no : '';
+        document.getElementById('journaldescription'+row).value=response.data.no!=null? response.data.no : '';
+        document.getElementById('render_select_cost_center_desc_code').click();
     }
     setAccountJournalEntry = async(row) =>{
         var code=document.getElementById('accjournalcode'+row).value;
+        console.log(code+" "+row+" account journal entry");
         document.getElementById('accjournbale'+row).value=code;
         document.getElementById('setselectpickerbuttonjournal_entry').setAttribute('data-value',row);
         document.getElementById('setselectpickerbuttonjournal_entry').click();
@@ -86,8 +89,18 @@ class JEModal extends React.Component{
             },
             crossDomain: true
         });
-        document.getElementById('journalcost_center_td'+row).innerHTML=response.data.name;
-        document.getElementById('journalcost_center_td_input'+row).value=response.data.no;
+        document.getElementById('journalcost_center_td'+row).value=response.data.no!=null? response.data.no : '';
+        document.getElementById('journaldescription'+row).value=response.data.no!=null? response.data.no : '';
+        document.getElementById('journalcost_center_td_input'+row).value=response.data.no!=null? response.data.no : '';
+        
+        document.getElementById('render_select_cost_center_desc_code').click();
+    }
+    set_select_value_cost_center_desc_code(origin,destination,hidden){
+        var code=document.getElementById(origin).value;
+        document.getElementById(destination).value=code!=null? code : '' ;
+        document.getElementById(hidden).value=code!=null? code : '' ;
+        document.getElementById('setselectpickerbutton').click();
+        
     }
     DeleteAllRows = ()=>{
         document.getElementById('destroydatatable').click();
@@ -118,6 +131,7 @@ class JEModal extends React.Component{
         document.getElementById('credit_total_hitn').innerHTML=number_format(creditJhint,2);
     }
     AddTableRow(){
+        document.getElementById('destroy_seelcpickerjournal').click();
         const item = "asdasdasd";
         this.setState({
           rows: [...this.state.rows, item]
@@ -206,28 +220,295 @@ class JEModal extends React.Component{
         
     }
     _handleKeyDown =(e,indx) => {
-        e.preventDefault();
+        
         console.log(" key pressed : "+e.key);
+        if(e.key === 'ArrowRight'){
+            e.preventDefault();
+            var withNoDigits = e.target.id.replace(/[0-9]/g, '');
+            if(withNoDigits==""){
+                e.target.click();
+                console.log("e.target : "+e.target.getAttribute('aria-controls'));
+                var ariacontrol=e.target.getAttribute('aria-controls');
+                console.log(document.querySelectorAll("[aria-owns='"+ariacontrol+"']"));
+                var nodelist=document.querySelectorAll("[aria-owns='"+ariacontrol+"']");
+                for (var i = 0; i < nodelist.length; i++) {
+                    console.log(nodelist[i].getAttribute('data-id'));
+                    withNoDigits=nodelist[i].getAttribute('data-id').replace(/[0-9]/g, '');
+                }
+                if(withNoDigits!=''){
+                    console.log("withNoDigits : "+withNoDigits+(parseFloat(indx)-parseFloat(1)));
+                    //document.getElementById('journalcost_center_td1').focus();
+                    if(withNoDigits=="accjournalcode"){
+                        document.getElementById("accjournbale"+(parseFloat(indx))).focus(); 
+                        document.getElementById("accjournbale"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="accjournbale"){
+                        document.getElementById("journaldescription"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journaldescription"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journaldescription"){
+                        document.getElementById("journalcost_center_td"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalcost_center_td"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journalcost_center_td"){
+                        document.getElementById("journaldebit"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journaldebit"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journaldebit"){
+                        document.getElementById("journalcredit"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalcredit"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journalcredit"){
+                        document.getElementById("journalnamename"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalnamename"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journalnamename"){
+                        if(this.props.JournalType=="Cheque Voucher"){
+                            document.getElementById("journalcheque_no_td"+(parseFloat(indx))).focus(); 
+                            document.getElementById("journalcheque_no_td"+(parseFloat(indx))).click(); 
+                        }else{
+                            document.getElementById("journalref_no_td"+(parseFloat(indx))).focus(); 
+                            document.getElementById("journalref_no_td"+(parseFloat(indx))).click(); 
+                        }
+                        
+                    }
+                    else if(withNoDigits=="journalcheque_no_td"){
+                        document.getElementById("journalref_no_td"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalref_no_td"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journalref_no_td"){
+                        document.getElementById("date_deposited"+(parseFloat(indx))).focus(); 
+                        document.getElementById("date_deposited"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="date_deposited"){
+                        document.getElementById("accjournalcode"+(parseFloat(indx))).focus(); 
+                        document.getElementById("accjournalcode"+(parseFloat(indx))).click(); 
+                    }
+                }
+            }else{
+                
+                //document.getElementById('journalcost_center_td1').focus();
+                if(withNoDigits=="accjournalcode"){
+                    document.getElementById("accjournbale"+(parseFloat(indx))).focus(); 
+                    document.getElementById("accjournbale"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="accjournbale"){
+                    document.getElementById("journaldescription"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journaldescription"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journaldescription"){
+                    document.getElementById("journalcost_center_td"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journalcost_center_td"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journalcost_center_td"){
+                    document.getElementById("journaldebit"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journaldebit"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journaldebit"){
+                    document.getElementById("journalcredit"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journalcredit"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journalcredit"){
+                    document.getElementById("journalnamename"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journalnamename"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journalnamename"){
+                    if(this.props.JournalType=="Cheque Voucher"){
+                        document.getElementById("journalcheque_no_td"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalcheque_no_td"+(parseFloat(indx))).click(); 
+                    }else{
+                        document.getElementById("journalref_no_td"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalref_no_td"+(parseFloat(indx))).click(); 
+                    }
+                    
+                }
+                else if(withNoDigits=="journalcheque_no_td"){
+                    document.getElementById("journalref_no_td"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journalref_no_td"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journalref_no_td"){
+                    document.getElementById("date_deposited"+(parseFloat(indx))).focus(); 
+                    document.getElementById("date_deposited"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="date_deposited"){
+                    document.getElementById("accjournalcode"+(parseFloat(indx))).focus(); 
+                    document.getElementById("accjournalcode"+(parseFloat(indx))).click(); 
+                }
+                
+            }
+        }
+        if(e.key === 'ArrowLeft'){
+            e.preventDefault();
+            var withNoDigits = e.target.id.replace(/[0-9]/g, '');
+            if(withNoDigits==""){
+                e.target.click();
+                console.log("e.target : "+e.target.getAttribute('aria-controls'));
+                var ariacontrol=e.target.getAttribute('aria-controls');
+                console.log(document.querySelectorAll("[aria-owns='"+ariacontrol+"']"));
+                var nodelist=document.querySelectorAll("[aria-owns='"+ariacontrol+"']");
+                for (var i = 0; i < nodelist.length; i++) {
+                    console.log(nodelist[i].getAttribute('data-id'));
+                    withNoDigits=nodelist[i].getAttribute('data-id').replace(/[0-9]/g, '');
+                }
+                if(withNoDigits!=''){
+                    //document.getElementById('journalcost_center_td1').focus();
+                    if(withNoDigits=="accjournalcode"){
+                        document.getElementById("date_deposited"+(parseFloat(indx))).focus(); 
+                        document.getElementById("date_deposited"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="accjournbale"){
+                        document.getElementById("accjournalcode"+(parseFloat(indx))).focus(); 
+                        document.getElementById("accjournalcode"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journaldescription"){
+                        document.getElementById("accjournbale"+(parseFloat(indx))).focus(); 
+                        document.getElementById("accjournbale"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journalcost_center_td"){
+                        document.getElementById("journaldescription"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journaldescription"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journaldebit"){
+                        document.getElementById("journalcost_center_td"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalcost_center_td"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journalcredit"){
+                        document.getElementById("journaldebit"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journaldebit"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journalnamename"){
+                        
+                        document.getElementById("journalcredit"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalcredit"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journalcheque_no_td"){
+                        document.getElementById("journalnamename"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalnamename"+(parseFloat(indx))).click(); 
+                    }
+                    else if(withNoDigits=="journalref_no_td"){
+                        if(this.props.JournalType=="Cheque Voucher"){
+                            document.getElementById("journalcheque_no_td"+(parseFloat(indx))).focus(); 
+                            document.getElementById("journalcheque_no_td"+(parseFloat(indx))).click(); 
+                        }else{
+                            document.getElementById("journalnamename"+(parseFloat(indx))).focus(); 
+                            document.getElementById("journalnamename"+(parseFloat(indx))).click(); 
+                        }
+                        
+                    }
+                    else if(withNoDigits=="date_deposited"){
+                        document.getElementById("journalref_no_td"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalref_no_td"+(parseFloat(indx))).click(); 
+                    }
+                }
+            }else{
+                //document.getElementById('journalcost_center_td1').focus();
+                if(withNoDigits=="accjournalcode"){
+                    document.getElementById("date_deposited"+(parseFloat(indx))).focus(); 
+                    document.getElementById("date_deposited"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="accjournbale"){
+                    document.getElementById("accjournalcode"+(parseFloat(indx))).focus(); 
+                    document.getElementById("accjournalcode"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journaldescription"){
+                    document.getElementById("accjournbale"+(parseFloat(indx))).focus(); 
+                    document.getElementById("accjournbale"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journalcost_center_td"){
+                    document.getElementById("journaldescription"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journaldescription"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journaldebit"){
+                    document.getElementById("journalcost_center_td"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journalcost_center_td"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journalcredit"){
+                    document.getElementById("journaldebit"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journaldebit"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journalnamename"){
+                    
+                    document.getElementById("journalcredit"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journalcredit"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journalcheque_no_td"){
+                    document.getElementById("journalnamename"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journalnamename"+(parseFloat(indx))).click(); 
+                }
+                else if(withNoDigits=="journalref_no_td"){
+                    if(this.props.JournalType=="Cheque Voucher"){
+                        document.getElementById("journalcheque_no_td"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalcheque_no_td"+(parseFloat(indx))).click(); 
+                    }else{
+                        document.getElementById("journalnamename"+(parseFloat(indx))).focus(); 
+                        document.getElementById("journalnamename"+(parseFloat(indx))).click(); 
+                    }
+                    
+                }
+                else if(withNoDigits=="date_deposited"){
+                    document.getElementById("journalref_no_td"+(parseFloat(indx))).focus(); 
+                    document.getElementById("journalref_no_td"+(parseFloat(indx))).click(); 
+                }
+            }
+        }
         if(e.key === 'ArrowUp'){
+            e.preventDefault();
             if(indx!=1){
-                console.log("e.target : "+e.target.nodeName);
                 var withNoDigits = e.target.id.replace(/[0-9]/g, '');
-                if(withNoDigits!=""){
-                    console.log("withNoDigits : "+withNoDigits);
-                    document.getElementById(withNoDigits+(parseFloat(indx)-parseFloat(1))).focus();
+                if(withNoDigits==""){
+                    console.log("e.target : "+e.target.getAttribute('aria-controls'));
+                    var ariacontrol=e.target.getAttribute('aria-controls');
+                    console.log(document.querySelectorAll("[aria-owns='"+ariacontrol+"']"));
+                    var nodelist=document.querySelectorAll("[aria-owns='"+ariacontrol+"']");
+                    for (var i = 0; i < nodelist.length; i++) {
+                        console.log(nodelist[i].getAttribute('data-id'));
+                        withNoDigits=nodelist[i].getAttribute('data-id').replace(/[0-9]/g, '');
+                    }
+                    if(withNoDigits!=''){
+                        console.log("withNoDigits : "+withNoDigits+(parseFloat(indx)-parseFloat(1)));
+                        //document.getElementById('journalcost_center_td1').focus();
+                        document.getElementById(withNoDigits+(parseFloat(indx)-parseFloat(1))).focus(); 
+                        document.getElementById(withNoDigits+(parseFloat(indx)-parseFloat(1))).click(); 
+                    }
+                    
+                }else{
+                    console.log("withNoDigits : "+withNoDigits+(parseFloat(indx)-parseFloat(1)));
+                    //document.getElementById('journalcost_center_td1').focus();
+                    document.getElementById(withNoDigits+(parseFloat(indx)-parseFloat(1))).focus(); 
+                    document.getElementById(withNoDigits+(parseFloat(indx)-parseFloat(1))).click(); 
                 }
                 
             }
         }
         if (e.key === 'Enter' || e.key === 'ArrowDown') {
+            e.preventDefault();
             if(indx==parseFloat(this.state.rows.length)+parseFloat(2)){
                 this.AddTableRow();
             }else{
                 var withNoDigits = e.target.id.replace(/[0-9]/g, '');
-                if(withNoDigits!=""){
-                    console.log("withNoDigits : "+withNoDigits);
+                if(withNoDigits==""){
+                    console.log("e.target : "+e.target.getAttribute('aria-controls'));
+                    var ariacontrol=e.target.getAttribute('aria-controls');
+                    console.log(document.querySelectorAll("[aria-owns='"+ariacontrol+"']"));
+                    var nodelist=document.querySelectorAll("[aria-owns='"+ariacontrol+"']");
+                    for (var i = 0; i < nodelist.length; i++) {
+                        console.log(nodelist[i].getAttribute('data-id'));
+                        withNoDigits=nodelist[i].getAttribute('data-id').replace(/[0-9]/g, '');
+                    }
+                    if(withNoDigits!=''){
+                        console.log("withNoDigits : "+withNoDigits+(parseFloat(indx)+parseFloat(1)));
+                        //document.getElementById('journalcost_center_td1').focus();
+                        document.getElementById(withNoDigits+(parseFloat(indx)+parseFloat(1))).focus();
+                        document.getElementById(withNoDigits+(parseFloat(indx)+parseFloat(1))).click();
+                    }
+                    
+                }else{
+                    console.log("withNoDigits : "+withNoDigits+(parseFloat(indx)+parseFloat(1)));
+                    //document.getElementById('journalcost_center_td1').focus();
                     document.getElementById(withNoDigits+(parseFloat(indx)+parseFloat(1))).focus();
+                    document.getElementById(withNoDigits+(parseFloat(indx)+parseFloat(1))).click();
                 }
+                
                
             }
           console.log(indx+" "+(parseFloat(this.state.rows.length)+parseFloat(2)));
@@ -250,12 +531,22 @@ class JEModal extends React.Component{
                 <option key={index} value={dat.display_name!=""? dat.display_name : dat.f_name+" "+dat.l_name}>{dat.account_type}</option>
             ]
         });
-        
+        const cost_center_list_list=this.props.cost_center_list.map((dat,index) =>{
+            return [
+                <option key={index} value={dat.cc_no}>{dat.cc_name}</option>
+            ]
+        });
+        const cost_center_code_list=this.props.cost_center_list.map((dat,index) =>{
+            return [
+                <option key={index} value={dat.cc_no}>{dat.cc_name_code}</option>
+            ]
+        });
         // const data=this.state.data.map((dat) =>{
         //     return <div key={dat.id}>{dat.id+" "+dat.name+" "+dat.position}</div>
         // });
         return (
             <div>
+                <button style={{display:'none'}} id="destroy_seelcpickerjournal"></button>
                 <div className="modal fade p-0" id="journalentrymodal" tabIndex="-1" role="dialog" aria-hidden="true" >
                 <form onSubmit={this.submitJournalEntryModal} id="journalentry_modal_form">
                     <div className="modal-dialog modal-full" role="document" style={{minWidth : '100%' , margin :'0'}}>
@@ -298,22 +589,22 @@ class JEModal extends React.Component{
                                     
                                     <a className="dropdown-item" href="#" style={{display : 'none'}} id="SalesReceiptModalHiddenButton" onClick="no_reload_sr()" data-toggle="modal" data-target="#salesreceiptmodal">Sales Receipt</a>
                                     <a className="dropdown-item"  href="#" id="invoicemodalSelect" style={{display : 'none'}} data-toggle="modal" data-target="#invoicemodaljournal">Invoice</a>
-                                    <div className="table-responsive-md">
-
-                                    <table className="table table-bordered text-left font14  table-sm" style={{border : '0'}} id="journalentrytable">
+                                    <div className="table-responsive-xl">
+                                    <button type="button" id="render_select_cost_center_desc_code" style={{display : 'none'}}></button>
+                                    <table className=" table table-bordered text-left font14 table-sm" style={{border : '0'}} id="journalentrytable">
                                         <thead>
                                         <tr style={{backgroundColor : 'rgb(228, 236, 247)', color :'#666'}}>
                                             <th className="text-left" width="3%">#</th>
                                             <th className="text-left" width="10%">ACCOUNT CODE</th>
-                                            <th className="text-left" width="15%">ACCOUNT DESCRIPTION</th>
+                                            <th className="text-left" width="10%">ACCOUNT DESCRIPTION</th>
+                                            <th className="text-left" width="10%">COST CENTER CODE</th>
                                             <th className="text-left" width="10%">COST CENTER DESCRIPTION</th>
                                             <th className="text-left" width="8%">DEBIT</th>
                                             <th className="text-left" width="8%">CREDIT</th>
-                                            <th className="text-left" width="10%">DESCRIPTION</th>
                                             <th className="text-left" width="15%">PAYEE</th>
                                             <th className="text-left" width="8%">CHEQUE NO</th>
-                                            <th className="text-left" width="5%">REFERENCE</th>
-                                            <th className="text-left" width="3%">DATE DEPOSITED</th>
+                                            <th className="text-left" width="8%">REFERENCE</th>
+                                            <th className="text-left" width="10%">DATE DEPOSITED</th>
                                             <th className="text-center" width="2%"></th>
                                         </tr>
                                         </thead>
@@ -322,7 +613,7 @@ class JEModal extends React.Component{
                                             
                                             <td className="pt-3-half"  style={{padding : '0px 0px 0px 2px'}}>1</td>
                                             <td className="pt-3-half" >
-                                                <select className="selectpicker form-control input-block-level" onChange={()=>this.setAccountJournalEntry('1')} required data-live-search="true"  id="accjournalcode1" name="accjournalcode1" >
+                                                <select className="selectpicker form-control " onChange={()=>this.setAccountJournalEntry('1')} required data-live-search="true"  id="accjournalcode1" name="accjournalcode1" >
                                                     <option value="">--Select--</option>
                                                     {coa_code_list}
                                                 </select>
@@ -335,7 +626,17 @@ class JEModal extends React.Component{
                                                 </select>
                                                 <input type="hidden" id="journalcost_center_td_input1" name="journalcost_center_td_input1"/>
                                             </td>
-                                            <td className="pt-3-half"  id="journalcost_center_td1">
+                                            <td className="pt-3-half"  >
+                                                <select id="journaldescription1" onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription1', 'journalcost_center_td1','journalcost_center_td_input1')} name="journaldescription1" class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true">
+                                                    <option value="">--Select--</option>
+                                                    {cost_center_code_list}
+                                                </select>
+                                            </td>
+                                            <td className="pt-3-half"  >
+                                                <select  onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td1', 'journaldescription1','journalcost_center_td_input1')} id="journalcost_center_td1" class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true">
+                                                    <option value="">--Select--</option>
+                                                    {cost_center_list_list}
+                                                </select>
 
                                             </td>
                                             <td className="pt-3-half"  >
@@ -344,9 +645,7 @@ class JEModal extends React.Component{
                                             <td className="pt-3-half"  >
                                                 <input type="number" step="0.01" onKeyUp={()=>this.swap2('journaldebit','1')} onInput={()=>this.swap2('journaldebit','1')} id="journalcredit1" name="journalcredit1" />
                                             </td>
-                                            <td className="pt-3-half"  >
-                                                <textarea id="journaldescription1" name="journaldescription1" style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea>
-                                            </td>
+                                            
                                             <td className="pt-3-half"  >
                                                 <input type="text" className="w-100" list="customer_list_all" placeholder="Supplier/Customer" onKeyUp="addnewCustomerDatalist(this)" onChange="addnewCustomerDatalist(this)" id="journalnamename1" name="journalnamename1" />
                                             </td>
@@ -366,7 +665,7 @@ class JEModal extends React.Component{
                                             <td className="pt-3-half"  style={{padding : '0px 0px 0px 2px'}}>2</td>
                                             <td className="pt-3-half" >
                                                 
-                                                <select className="selectpicker form-control input-block-level" onChange={()=>this.setAccountJournalEntry('2')} required data-live-search="true" id="accjournalcode2" name="accjournalcode2" >
+                                                <select className="selectpicker form-control" onChange={()=>this.setAccountJournalEntry('2')} required data-live-search="true" id="accjournalcode2" name="accjournalcode2" >
                                                     <option value="">--Select--</option>
                                                     {coa_code_list}
                                                 </select>    
@@ -379,14 +678,21 @@ class JEModal extends React.Component{
                                                 </select>  
                                                 <input type="hidden" id="journalcost_center_td_input2" name="journalcost_center_td_input2"/>  
                                             </td>
-                                            <td className="pt-3-half"  id="journalcost_center_td2">
-
+                                            <td className="pt-3-half" >
+                                                <select onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription2', 'journalcost_center_td2','journalcost_center_td_input2')} id="journaldescription2" class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true">
+                                                    <option value="">--Select--</option>
+                                                    {cost_center_code_list}
+                                                </select>
+                                            </td>
+                                            <td className="pt-3-half"  >
+                                                <select onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td2', 'journaldescription2','journalcost_center_td_input2')} id="journalcost_center_td2" class="form-control  COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true">
+                                                    <option value="">--Select--</option>
+                                                    {cost_center_list_list}
+                                                </select>
                                             </td>
                                             <td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journalcredit','2')} onInput={()=>this.swap2('journalcredit','2')} id="journaldebit2" name="journaldebit2" /></td>
                                             <td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journaldebit','2')} onInput={()=>this.swap2('journaldebit','2')}  id="journalcredit2" name="journalcredit2" /></td>
-                                            <td className="pt-3-half" >
-                                                <textarea id="journaldescription2" style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea>
-                                            </td>
+                                            
                                             <td className="pt-3-half"  >
                                                 <input type="text" className="w-100" list="customer_list_all" placeholder="Supplier/Customer" onKeyUp="addnewCustomerDatalist(this)" onChange="addnewCustomerDatalist(this)" id="journalnamename2" name="journalnamename2" />
                                                 
@@ -459,19 +765,19 @@ class JEModal extends React.Component{
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="ACCOUNT DESCRIPTION"? (<td className="pt-3-half" ><select className="selectpicker form-control" onChange={()=>this.setAccountCodeJournalEntry(parseFloat(idx)+parseFloat(3))} required data-live-search="true" id={`accjournbale${parseFloat(idx)+parseFloat(3)}`}name={`accjournbale${parseFloat(idx)+parseFloat(3)}`} ><option value="">--Select--</option>{coa_name_list}</select><input type="hidden"  id={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td_input${parseFloat(idx)+parseFloat(3)}`} /></td>)  : thirteenth;
                                                 }
 
-                                                first =table.rows[0].cells[0].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : first;
-                                                second =table.rows[0].cells[1].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : second;
-                                                third =table.rows[0].cells[2].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : third;
-                                                fourth =table.rows[0].cells[3].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : fourth;
-                                                fifth =table.rows[0].cells[4].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : fifth;
-                                                sixth =table.rows[0].cells[5].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : sixth;
-                                                seventh =table.rows[0].cells[6].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : seventh;
-                                                eighth =table.rows[0].cells[7].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : eighth;
-                                                nineth =table.rows[0].cells[8].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>)  : nineth;
-                                                thenth =table.rows[0].cells[9].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>) : thenth;
-                                                twelve =table.rows[0].cells[10].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>) : twelve;
+                                                first =table.rows[0].cells[0].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  ><select  onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>)  : first;
+                                                second =table.rows[0].cells[1].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  ><select onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )}  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>)  : second;
+                                                third =table.rows[0].cells[2].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  ><select  onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>)  : third;
+                                                fourth =table.rows[0].cells[3].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  ><select onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )}  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>)  : fourth;
+                                                fifth =table.rows[0].cells[4].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  ><select  onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>)  : fifth;
+                                                sixth =table.rows[0].cells[5].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  ><select  onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>)  : sixth;
+                                                seventh =table.rows[0].cells[6].innerHTML=="COST CENTER DESCRIPTION"?(<td className="pt-3-half"  ><select onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>)  : seventh;
+                                                eighth =table.rows[0].cells[7].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  ><select onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>)  : eighth;
+                                                nineth =table.rows[0].cells[8].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  ><select onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>)  : nineth;
+                                                thenth =table.rows[0].cells[9].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  ><select onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>) : thenth;
+                                                twelve =table.rows[0].cells[10].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half" ><select onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)) )} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>) : twelve;
                                                 if(""==""){
-                                                thirteenth =table.rows[0].cells[11].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half"  id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`}></td>) : thirteenth;
+                                                thirteenth =table.rows[0].cells[11].innerHTML=="COST CENTER DESCRIPTION"? (<td className="pt-3-half" ><select onChange={()=>this.set_select_value_cost_center_desc_code('journalcost_center_td'+(parseFloat(idx)+parseFloat(3)), 'journaldescription'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} name={`journalcost_center_td${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_list_list}</select></td>) : thirteenth;
                                                 }
 
                                                 first =table.rows[0].cells[0].innerHTML=="DEBIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" autoFocus onKeyUp={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journalcredit',parseFloat(idx)+parseFloat(3))} id={`journaldebit${parseFloat(idx)+parseFloat(3)}`} name={`journaldebit${parseFloat(idx)+parseFloat(3)}`} /></td>)  : first;
@@ -504,19 +810,19 @@ class JEModal extends React.Component{
                                                 thirteenth =table.rows[0].cells[11].innerHTML=="CREDIT"? (<td className="pt-3-half"  ><input type="number" step="0.01" onKeyUp={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))} onInput={()=>this.swap2('journaldebit',parseFloat(idx)+parseFloat(3))}  id={`journalcredit${parseFloat(idx)+parseFloat(3)}`} name={`journalcredit${parseFloat(idx)+parseFloat(3)}`} /></td>) : thirteenth;
                                                 }
                                                 
-                                                first =table.rows[0].cells[0].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`}  name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : first;
-                                                second =table.rows[0].cells[1].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : second;
-                                                third =table.rows[0].cells[2].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`}  style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : third;
-                                                fourth =table.rows[0].cells[3].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : fourth;
-                                                fifth =table.rows[0].cells[4].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : fifth;
-                                                sixth =table.rows[0].cells[5].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : sixth;
-                                                seventh =table.rows[0].cells[6].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : seventh;
-                                                eighth =table.rows[0].cells[7].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : eighth;
-                                                nineth =table.rows[0].cells[8].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : nineth;
-                                                thenth =table.rows[0].cells[9].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : thenth;
-                                                twelve =table.rows[0].cells[10].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : twelve;
+                                                first =table.rows[0].cells[0].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select   onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`}  name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : first;
+                                                second =table.rows[0].cells[1].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select  onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : second;
+                                                third =table.rows[0].cells[2].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select   onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`}  class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : third;
+                                                fourth =table.rows[0].cells[3].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select  onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : fourth;
+                                                fifth =table.rows[0].cells[4].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select   onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : fifth;
+                                                sixth =table.rows[0].cells[5].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select   onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : sixth;
+                                                seventh =table.rows[0].cells[6].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half"><select  onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : seventh;
+                                                eighth =table.rows[0].cells[7].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select  onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : eighth;
+                                                nineth =table.rows[0].cells[8].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select  onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : nineth;
+                                                thenth =table.rows[0].cells[9].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select  onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : thenth;
+                                                twelve =table.rows[0].cells[10].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : twelve;
                                                 if(""==""){
-                                                thirteenth =table.rows[0].cells[11].innerHTML=="DESCRIPTION"? (<td className="pt-3-half" ><textarea id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} style={{width : '100%',border : '0px solid white' , textTransform : 'capitalize'}}></textarea></td>)  : thirteenth;
+                                                thirteenth =table.rows[0].cells[11].innerHTML=="COST CENTER CODE"? (<td className="pt-3-half" ><select onChange={()=>this.set_select_value_cost_center_desc_code('journaldescription'+(parseFloat(idx)+parseFloat(3)), 'journalcost_center_td'+(parseFloat(idx)+parseFloat(3)),'journalcost_center_td_input'+(parseFloat(idx)+parseFloat(3)))} id={`journaldescription${parseFloat(idx)+parseFloat(3)}`} name={`journaldescription${parseFloat(idx)+parseFloat(3)}`} class="form-control COSTCENTER_LIST_JOURNALDESCRIPTION selectpicker" data-live-search="true"><option value="">--Select--</option>{cost_center_code_list}</select></td>)  : thirteenth;
                                                 }
                                                 
                                                 first =table.rows[0].cells[0].innerHTML=="PAYEE"? (<td className="pt-3-half"  ><input type="text" className="w-100" list="customer_list_all" placeholder="Supplier/Customer" onKeyUp="addnewCustomerDatalist(this)" onChange="addnewCustomerDatalist(this)" id={`journalnamename${parseFloat(idx)+parseFloat(3)}`}  name={`journalnamename${parseFloat(idx)+parseFloat(3)}`}/></td>) : first;
@@ -621,9 +927,9 @@ class JEModal extends React.Component{
                                                 <td style={{verticalAlign :'middle'}}></td>
                                                 <td style={{verticalAlign :'middle'}}></td>
                                                 <td style={{verticalAlign :'middle'}}></td>
+                                                <td style={{verticalAlign :'middle'}}></td>
                                                 <td style={{verticalAlign :'middle' , fontWeight : 'bold' , fontSize : '13px'}} id="debit_total_hitn">0.00</td>
                                                 <td style={{verticalAlign :'middle' , fontWeight : 'bold' , fontSize : '13px'}} id="credit_total_hitn">0.00</td>
-                                                <td style={{verticalAlign :'middle'}}></td>
                                                 <td style={{verticalAlign :'middle'}}></td>
                                                 <td style={{verticalAlign :'middle'}}></td>
                                                 <td style={{verticalAlign :'middle'}}></td>

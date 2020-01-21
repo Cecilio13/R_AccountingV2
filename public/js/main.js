@@ -115,6 +115,9 @@ jQuery(document).ready(function($) {
 	var bill_payment_table;
 	var table_pay_bills_modal_tabel;
 	var bill_account_table;
+	var productandservicestale;
+	var customers_table;
+	var suppliertable;
 	$('#destroyinvoicetabledatatable').on('click',function(event){
 		
 		$("#main_invoice_table").dataTable().fnDestroy();
@@ -219,6 +222,35 @@ jQuery(document).ready(function($) {
 		
 	});
 	
+	
+	$('#refresh_product_table').on('click',function(event){
+		productandservicestale = $('#productandservicestale').DataTable({
+			order: [[ 1, "asc" ]],
+			
+		});
+		
+	})
+	$('#refresh_supplier_table').on('click',function(event){
+		suppliertable = $('#suppliertable').DataTable({
+            order: [[ 1, "desc" ]],
+            
+        });
+		
+	})
+	$('#refresh_customer_table').on('click',function(event){
+		customers_table = $('#customertable').DataTable({
+			order: [[ 1, "desc" ]],
+			paging: true,
+			
+		});
+		
+	})
+	
+	if(document.getElementById('customertable_info')){
+		document.getElementById('customertable_info').style.display="none";
+		document.getElementById('customertable_length').style.display="none";
+		
+	}
 	$('#rerenderbuttoncreditnote').on('click',function(event){
 		
 		credit_note_table=$("#credit_note_table").DataTable({
@@ -366,10 +398,14 @@ jQuery(document).ready(function($) {
 	});
 	$('#bill_modal_refreshbtn').on('click',function(event){
 		$('.bill_account_select').selectpicker('refresh');
+		$('.bill_cost_center_select').selectpicker('refresh');
 	});
 	
 	$('#cashaccount_select').on('click',function(event){
 		$('.cashaccount_select').selectpicker('refresh');
+	});
+	$('#render_select_cost_center_desc_code').on('click',function(event){
+		$('.COSTCENTER_LIST_JOURNALDESCRIPTION').selectpicker('refresh');
 	});
 	
 	$('#destroydatatable').on('click',function(event){
@@ -569,10 +605,16 @@ jQuery(document).ready(function($) {
 		//refreshpicjer();
 	})
 	$('#setselectpickerbutton').on('click',function(event){
-		$('.selectpicker').selectpicker('refresh');
+		$('#journalentrytable select').selectpicker('refresh');
 		console.log('refresh selectpicker');
 		//refreshpicjer();
 	})
+	$('#destroy_seelcpickerjournal').on('click',function(event){
+		$('#journalentrytable select').selectpicker('destroy');
+		console.log('qweqwe selectpicker');
+		//refreshpicjer();
+	})
+	
 	$('#setselectpickerbuttoninvoice').on('click',function(event){
 		$('.selectpicker').selectpicker('refresh');
 		console.log('refresh selectpicker');

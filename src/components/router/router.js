@@ -33,6 +33,7 @@ import Report_Content_P from '../Report_Content_P.js';
 import Report_Content_ACC from '../Report_Content_ACC.js';
 import Report_Content_Recent from '../Report_Content_Recent.js';
 import Report_Content_J from '../Report_Content_J.js';
+import Register from '../Register.js';
 
 const RouteController = () => (
     
@@ -85,6 +86,9 @@ const RouteController = () => (
                 </Route>
                 <Route path="/alllists">
                     <AllList />
+                </Route>
+                <Route path="/register">
+                    <Register />
                 </Route>
                 <Route path="/">
                     <App />

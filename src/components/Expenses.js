@@ -9,9 +9,11 @@ import Side from './inc/side.js';
 import { number_format } from '../Helper';
 var refresh_expense_table=0;
 var refresh_pay_bills_table=0;
+var refresh_supplier_table=1;
 class Expense extends React.Component{
     state ={
         supplierss: [],
+        access : [],
         YearSelected : moment().format('YYYY'),
         //YearSelected : 2019,
         year_beg : '',
@@ -26,7 +28,16 @@ class Expense extends React.Component{
         PayBill : [],
         supplier_credit_table_rows : [],
     }
-    
+    getUserAccess= async (event) =>{
+        const response = await axios.get('http://localhost/Accounting_modified/public/api/get_access',{
+            params:{
+                id: sessionStorage.getItem('Accounting_App_id'),
+            },
+            crossDomain: true
+        });
+        console.log(response.data.access);
+        this.setState({access : response.data.access});
+    }
     getExpenseTransactionPage= async (props) =>{
         const response = await axios.get('http://localhost/Accounting_modified/public/api/getExpenseTransactionPage',{
             params:{
@@ -52,6 +63,7 @@ class Expense extends React.Component{
 
     componentDidMount(){
         this.getExpenseTransactionPage();
+        this.getUserAccess();
         this.setState({YearSelected : moment().format('YYYY')})
         
     }
@@ -75,6 +87,14 @@ class Expense extends React.Component{
            
         }
     }
+    refresh_supplier_table =(event) =>{
+        if(refresh_supplier_table==1){
+            refresh_supplier_table=0;
+            document.getElementById('refresh_supplier_table').click();
+           
+        }
+    }
+    
     refresh_pay_bills_table =(event) =>{
         if(refresh_pay_bills_table==1){
             refresh_pay_bills_table=0;
@@ -173,7 +193,7 @@ class Expense extends React.Component{
                         <td class="pt-3-half" style={{verticalAlign : 'middle'}} >{dat.display_name!=""? (dat.display_name!=null? dat.display_name : dat.f_name+" "+dat.l_name) : dat.f_name+" "+dat.l_name}</td>
                         <td class="pt-3-half" style={{verticalAlign : 'middle'}} >{dat.et_ad_desc}</td>
                         <td class="pt-3-half" style={{verticalAlign : 'middle'}} className={`${text}`}>{dat.et_due_date!="" && dat.et_due_date!=null? moment(dat.et_due_date).format('MM-DD-YYYY') : ''}</td>
-                        <td class="pt-3-half" style={{verticalAlign : 'middle'}} >{dat.cc_name}</td>
+                        <td class="pt-3-half" style={{verticalAlign : 'middle'}} >{dat.coa_name}</td>
                         <td class="pt-3-half" style={{verticalAlign : 'middle'}} >{dat.et_memo}</td>
                         <td class="pt-3-half" style={{verticalAlign : 'middle'}} >PHP {number_format(dat.et_ad_total,2)}</td>
                         <td class="pt-3-half" style={{verticalAlign : 'middle'}} >
@@ -319,9 +339,16 @@ class Expense extends React.Component{
                                     <h3 class="mt-2">Expense Transactions</h3>
                                 </div>
                                 <div class="col-md-10 mb-5 mt-3 p-0">
+                                    {this.state.access!=null && this.state.access.bill=="1"? 
                                     <a class="btn btn-success mr-1" href="#" data-toggle="modal" data-target="#import_bill_modal">Import Bill</a>
+                                    : ''}
+                                    {this.state.access!=null && this.state.access.bill=="1"? 
                                     <a class="btn btn-success mr-1" href="#" data-toggle="modal" data-target="#billmodal" onclick="ResetBills()">Bill</a>
+                                    : ''}
+                                    {this.state.access!=null && this.state.access.pay_bills=="1"? 
                                     <a class="btn btn-success mr-1" href="#" data-toggle="modal" data-target="#paybillsmodal">Pay Bill</a>
+                                    : ''}
+                                    
                                 </div>
                                 <div class="col-md-2">
                                     <div class="input-group mb-3">
@@ -426,7 +453,8 @@ class Expense extends React.Component{
                                     
                                 </div>
                                 <div id="table" class="table-editable">
-                                    <table id="suppliertable" style={{backgroundColor : '#ccc'}} class="table table-bordered table-responsive-md  text-center font14">
+                                    <button style={{display : 'none'}} id="refresh_supplier_table"></button>
+                                    <table id="suppliertable" style={{backgroundColor : '#ccc'}} class="table table-bordered table-responsive-md  text-center font14" onMouseOver={()=>this.refresh_supplier_table()}>
                                         <thead>
                                         <tr>
                                             <th class="text-center">SUPPLIER/COMPANY</th>

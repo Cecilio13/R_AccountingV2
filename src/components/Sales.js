@@ -11,12 +11,17 @@ import DropDown from './inc/options_receive_payment.js';
 
 import { number_format } from '../Helper';
 var refresh_sales_table=0;
+var refresh_product_table=1;
+var refresh_customer_table=1;
 class Sales extends React.Component{
     state ={
         customers: [],
+        access : [],
         products_and_services: [],
         sales_setting: [],
         STInvoice : [],
+        sales_receipt_list: [],
+        st_invoice_data : [],
         prod: 0,
         prod2: 0,
         prod_id : '',
@@ -41,10 +46,34 @@ class Sales extends React.Component{
         yyyyy : '',
 
     }
+    getUserAccess= async (event) =>{
+        const response = await axios.get('http://localhost/Accounting_modified/public/api/get_access',{
+            params:{
+                id: sessionStorage.getItem('Accounting_App_id'),
+            },
+            crossDomain: true
+        });
+        console.log(response.data.access);
+        this.setState({access : response.data.access});
+    }
     refresh_sales_table =(event) =>{
         if(refresh_sales_table==1){
             refresh_sales_table=0;
             document.getElementById('refresh_sales_table').click();
+           
+        }
+    }
+    refresh_customer_table = (event) =>{
+        if(refresh_customer_table==1){
+            refresh_customer_table=0;
+            document.getElementById('refresh_customer_table').click();
+           
+        }
+    }
+    refresh_product_table = (event) =>{
+        if(refresh_product_table==1){
+            refresh_product_table=0;
+            document.getElementById('refresh_product_table').click();
            
         }
     }
@@ -73,6 +102,8 @@ class Sales extends React.Component{
         this.setState({year_end : response.data.year_end});
         this.setState({yyyyy : response.data.yyyyy});
         this.setState({YearSelected : response.data.yyyyy});
+        this.setState({sales_receipt_list : response.data.sales_receipt_list});
+        this.setState({st_invoice_data : response.data.st_invoice_data});
         
     }
     setEditProduct =(prod_id,prod_name,prod_sku,prod_category,prod_desc,prod_price,prod_cost,prod_qty,prod_reorder_point)=>{
@@ -92,7 +123,7 @@ class Sales extends React.Component{
     }
     componentDidMount(){
         this.getSalesTransactionPageInfo();
-        
+        this.getUserAccess();
         
     }
     SubmitNewProduct = async (event) =>{
@@ -332,7 +363,7 @@ class Sales extends React.Component{
                 </tr>
             ]
         });
-        
+        //sales_receipt_list
         const sales_transaction_list=this.state.sales_transaction.map((dat,index) =>{
             if(dat.st_type=="Invoice"){
                 document.getElementById('destroy_sales_table').click();
@@ -351,8 +382,47 @@ class Sales extends React.Component{
                         <td style={{verticalAlign : 'middle'}}>{moment(dat.st_date).format('MM-DD-YYYY')}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_location+" "+dat.st_invoice_type}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_no}</td>
+                        <td style={{verticalAlign : 'middle'}}>
+                        {this.state.st_invoice_data.map((coa,inn)=>{
+                            if(dat.st_no==coa.st_i_no && dat.st_location==coa.st_p_location && dat.st_invoice_type==coa.st_p_invoice_type && coa.st_p_reference_no==dat.st_i_attachment){
+                                return[
+                                    <div>
+                                        {coa.cc_name+" \n"}
+                                    </div>
+                                ]
+                            }
+                            
+                        })}
+                        
+                        </td>
                         <td style={{verticalAlign : 'middle'}}>{dat.display_name!=""? (dat.display_name!=null? dat.display_name : dat.f_name+" "+dat.l_name) : dat.f_name+" "+dat.l_name }</td>
                         <td style={{verticalAlign : 'middle'}} className={`${fontcolor}`}>{moment(dat.st_due_date).format('MM-DD-YYYY')}</td>
+                        <td style={{verticalAlign : 'middle'}}>
+                            {dat.cancellation_reason==null? 
+                            this.state.sales_receipt_list.map((coa,inn)=>{
+                                if(coa.st_payment_for==dat.st_no && dat.st_location==coa.st_location && dat.st_invoice_type==coa.st_invoice_type){
+                                    return [
+                                        <div>
+                                            {coa.st_no}
+                                        </div>
+                                    ]
+                                }
+                            })
+                            : ''}
+                        </td>
+                        <td style={{verticalAlign : 'middle'}}>
+                            {dat.cancellation_reason==null? 
+                            this.state.sales_receipt_list.map((coa,inn)=>{
+                                if(coa.st_payment_for==dat.st_no && dat.st_location==coa.st_location && dat.st_invoice_type==coa.st_invoice_type){
+                                    return [
+                                        <div>
+                                            {moment(dat.st_date).format('MM-DD-YYYY')}
+                                        </div>
+                                    ]
+                                }
+                            })
+                            : ''}
+                        </td>
                         <td style={{verticalAlign : 'middle'}}>{number_format(dat.st_balance,2)}</td>
                         <td style={{verticalAlign : 'middle'}}>{number_format(dat.invoice_total,2)}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_status}</td>
@@ -381,8 +451,11 @@ class Sales extends React.Component{
                         <td style={{verticalAlign : 'middle'}}>{moment(dat.st_date).format('MM-DD-YYYY')}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_type}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_no}</td>
+                        <td style={{verticalAlign : 'middle'}}></td>
                         <td style={{verticalAlign : 'middle'}}>{dat.display_name!=""? (dat.display_name!=null? dat.display_name : dat.f_name+" "+dat.l_name) : dat.f_name+" "+dat.l_name }</td>
                         <td style={{verticalAlign : 'middle'}}>N/A</td>
+                        <td style={{verticalAlign : 'middle'}}></td>
+                        <td style={{verticalAlign : 'middle'}}></td>
                         <td style={{verticalAlign : 'middle'}}>{number_format(dat.st_balance,2)}</td>
                         <td style={{verticalAlign : 'middle'}}>{number_format(dat.st_amount_paid,2)}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_status}</td>
@@ -399,8 +472,11 @@ class Sales extends React.Component{
                         <td style={{verticalAlign : 'middle'}}>{moment(dat.st_date).format('MM-DD-YYYY')}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_type}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_no}</td>
+                        <td style={{verticalAlign : 'middle'}}></td>
                         <td style={{verticalAlign : 'middle'}}>{dat.display_name!=""? (dat.display_name!=null? dat.display_name : dat.f_name+" "+dat.l_name) : dat.f_name+" "+dat.l_name }</td>
                         <td style={{verticalAlign : 'middle'}}>N/A</td>
+                        <td style={{verticalAlign : 'middle'}}></td>
+                        <td style={{verticalAlign : 'middle'}}></td>
                         <td style={{verticalAlign : 'middle'}}>{number_format(dat.st_balance,2)}</td>
                         <td style={{verticalAlign : 'middle'}}>{number_format(dat.st_amount_paid,2)}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_status}</td>
@@ -417,8 +493,11 @@ class Sales extends React.Component{
                         <td style={{verticalAlign : 'middle'}}>{moment(dat.st_date).format('MM-DD-YYYY')}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_type}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_no}</td>
+                        <td style={{verticalAlign : 'middle'}}></td>
                         <td style={{verticalAlign : 'middle'}}>{dat.display_name!=""? (dat.display_name!=null? dat.display_name : dat.f_name+" "+dat.l_name) : dat.f_name+" "+dat.l_name }</td>
                         <td style={{verticalAlign : 'middle'}}>N/A</td>
+                        <td style={{verticalAlign : 'middle'}}></td>
+                        <td style={{verticalAlign : 'middle'}}></td>
                         <td style={{verticalAlign : 'middle'}}>{number_format(dat.st_balance,2)}</td>
                         <td style={{verticalAlign : 'middle'}}>{number_format(dat.estimate_total,2)}</td>
                         <td style={{verticalAlign : 'middle'}}>{dat.st_status}</td>
@@ -472,11 +551,23 @@ class Sales extends React.Component{
                                     <h3 class="mt-2">Sales Transactions</h3>
                                     <div className ="col-md-10">
                                         <div class="mb-5 mt-3">
-                                            
+                                        {this.state.access!=null && this.state.access.invoice=="1"? 
                                             <a class="btn btn-success mr-1" href="#" data-toggle="modal" data-target="#import_invoice_modal">Import Invoices</a>
+                                            
+                                            
+                                            : ''}
+                                        {this.state.access!=null && this.state.access.invoice=="1"? 
                                             <a class="btn btn-success mr-1" href="#" data-toggle="modal" data-target="#invoicemodal">Invoice</a>
+                                            
+                                            
+                                            : ''}
+                                            {this.state.access!=null && this.state.access.estimate=="1"? 
                                             <a class="btn btn-success mr-1" href="#"  data-toggle="modal" data-target="#estimatemodal">Estimate</a>
+                                            : ''}
+                                            {this.state.access!=null && this.state.access.credit_note=="1"? 
                                             <a class="btn btn-success" href="#" data-toggle="modal" data-target="#creditnotemodal">Credit Note</a>
+                                            : ''}
+                                            
                                             
                                         </div>
                                     </div>
@@ -520,8 +611,11 @@ class Sales extends React.Component{
                                                 <th class="text-center">DATE</th>
                                                 <th class="text-center">TYPE</th>
                                                 <th class="text-center">NO.</th>
+                                                <th class="text-center">COST CENTER</th>
                                                 <th class="text-center">CUSTOMER</th>
                                                 <th class="text-center">DUE-DATE</th>
+                                                <th class="text-center">OR NO</th>
+                                                <th class="text-center">OR DATE</th>
                                                 <th class="text-center">BALANCE</th>
                                                 <th class="text-center">TOTAL</th>
                                                 <th class="text-center">STATUS</th>
@@ -545,19 +639,19 @@ class Sales extends React.Component{
                                             <a href="#" class="btn btn-success mr-1" data-target='#addcustomermodal' data-toggle="modal">New Customer</a>
                                             <a href="#" class="btn btn-success" data-target='#ImportCustomerModal' data-toggle="modal">Import Customers</a>
                                         </div>
-                                        <table id="customertable" style={{cursor : 'pointer',backgroundColor : '#ccc'}} class="table table-bordered table-sm table-responsive-md text-center font14" width="100%">
+                                        <button style={{display : 'none'}} id="refresh_customer_table"></button>
+                                        <table id="customertable" style={{cursor : 'pointer',backgroundColor : '#ccc'}} class="table table-bordered table-sm table-responsive-md text-center font14" width="100%" onMouseOver={()=>this.refresh_customer_table()}>
                                             <thead>
+                                                <tr>
                                                 <th class="text-center">CUSTOMER/COMPANY</th>
                                                 <th class="text-center">PHONE</th>
                                                 <th class="text-center">EMAIL</th>
                                                 <th class="text-center">OPEN BALANCE</th>
+                                                </tr>
                                             </thead>
                                             <tbody style={{backgroundColor : 'white'}}>
                                                 {customer_list}
                                             </tbody>
-                                                
-                                            
-                                            
                                         </table>
                                         <div class="modal fade" id="ImportCustomerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog  modal-sm" role="document">
@@ -670,8 +764,9 @@ class Sales extends React.Component{
                                             </div>
                                         </div>
                                     </div> 
+                                    <button style={{display : 'none'}} id="refresh_product_table"></button>
                                     <div id="table" class="table-editable" style={{marginTop :'10px'}}>
-                                    <table style={{width : '100%',backgroundColor : '#ccc'}} class="table table-bordered table-responsive-md  text-center font14" id="productandservicestale">
+                                    <table style={{width : '100%',backgroundColor : '#ccc'}} class="table table-bordered table-responsive-md  text-center font14" id="productandservicestale" onMouseOver={()=>this.refresh_product_table()}>
                                         <thead>
                                         <tr>
                                             <th class="text-center">NAME</th>

@@ -31,6 +31,7 @@ class JournalEntry extends React.Component{
         current_date : '',
         jounalcount : '0',
         customers : [],
+        cost_center_list : [],
         YearSelected : moment().format('YYYY'),
         year_beg : '',
         year_end : '',
@@ -60,6 +61,7 @@ class JournalEntry extends React.Component{
         this.setState({chequevoucher_no : response.data.chequevoucher_no});
         this.setState({jounalcount : response.data.jounalcount});
         this.setState({customers : response.data.customers});
+        this.setState({cost_center_list : response.data.cost_center_list});
         
         
     }
@@ -282,7 +284,7 @@ class JournalEntry extends React.Component{
                     <header id="header" className="header"> 
                     <Nav />
                     </header>
-                    <JEModal customers={this.state.customers} COA={this.state.COA} JournalType={this.state.JournalType} jounalcount={this.state.jounalcount} current_date={this.state.current_date} chequevoucher_no={this.state.chequevoucher_no} journalvoucher_no={this.state.journalvoucher_no} />
+                    <JEModal cost_center_list={this.state.cost_center_list} customers={this.state.customers} COA={this.state.COA} JournalType={this.state.JournalType} jounalcount={this.state.jounalcount} current_date={this.state.current_date} chequevoucher_no={this.state.chequevoucher_no} journalvoucher_no={this.state.journalvoucher_no} />
                     <div className="">
                         <div className="breadcrumbs">
                             <div className="page-header float-left">

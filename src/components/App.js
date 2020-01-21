@@ -5,6 +5,7 @@ import '../css/index.css';
 import Modal from './inc/modal.js';
 import Nav from './inc/nav.js';
 import Side from './inc/side.js';
+import { Link } from 'react-router-dom';
 
 class App extends React.Component{
     constructor() {
@@ -50,6 +51,7 @@ class App extends React.Component{
             sessionStorage.setItem('Accounting_App_email', '');
             sessionStorage.setItem('Accounting_App_name', '');
             sessionStorage.setItem('Accounting_App_position', '');
+            sessionStorage.setItem('Accounting_App_id', '');
         }else{
             console.log('correct credentials');
             console.log(response.data);
@@ -58,6 +60,7 @@ class App extends React.Component{
             sessionStorage.setItem('Accounting_App_email', this.state.email);
             sessionStorage.setItem('Accounting_App_name', response.data.name);
             sessionStorage.setItem('Accounting_App_position', response.data.position);
+            sessionStorage.setItem('Accounting_App_id', response.data.id);
             window.location.href="dashboard";
         }
         // const response = await axios.get('http://localhost/Accounting_modified/public/api/students',{
@@ -82,7 +85,20 @@ class App extends React.Component{
         return (
             <div>
                 <div className="">
-                
+                <nav class="navbar navbar-expand-md navbar-light bg-light mb-0"><div class="container">
+                    <Link style={{fontSize : '22px !important'}} to="." class="navbar-brand">
+                    AccountingSystem
+                    </Link> 
+                <button type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span class="navbar-toggler-icon"></span></button> 
+                <div id="navbarSupportedContent" class="collapse navbar-collapse">
+                    <ul class="navbar-nav mr-auto"></ul>
+                     <ul class="navbar-nav ml-auto">
+                        <li class="nav-item"><Link to="." class="nav-link">Login</Link></li>
+                        <li class="nav-item"><Link to="register" class="nav-link">Register</Link></li>
+                    </ul>
+                </div>
+                </div>
+                </nav>
                     <div className="py-4">
                         <div className="container">
                                 <div class="row justify-content-center">

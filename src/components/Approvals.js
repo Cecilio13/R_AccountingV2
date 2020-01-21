@@ -9,7 +9,7 @@ import Side from './inc/side.js';
 import {number_format} from '../Helper';
 class Approval extends React.Component{
     state ={
-        
+        access : [],
         bankedits : [],
         bankeditscount :'',
         costcenteredit: [],
@@ -38,8 +38,20 @@ class Approval extends React.Component{
         etaNewTotalAmount : [],
         stinvoiceeditTotalAmount : [],
         etaccdetailedittotal_amount : [],
+        PendingCancelEntrycount : '',
+        PendingCancelEntry : [],
+        journalentries: [],
     }
-    
+    getUserAccess= async (event) =>{
+        const response = await axios.get('http://localhost/Accounting_modified/public/api/get_access',{
+            params:{
+                id: sessionStorage.getItem('Accounting_App_id'),
+            },
+            crossDomain: true
+        });
+        console.log(response.data.access);
+        this.setState({access : response.data.access});
+    }
     getApprovalsData= async (props) =>{
         const response = await axios.get('http://localhost/Accounting_modified/public/api/get_all_pending_transaction_request',{
             params:{
@@ -76,6 +88,9 @@ class Approval extends React.Component{
         this.setState({etaNewTotalAmount : response.data.etaNewTotalAmount});
         this.setState({stinvoiceeditTotalAmount : response.data.stinvoiceeditTotalAmount});
         this.setState({etaccdetailedittotal_amount : response.data.etaccdetailedittotal_amount});
+        this.setState({PendingCancelEntry : response.data.PendingCancelEntry});
+        this.setState({PendingCancelEntrycount : response.data.PendingCancelEntrycount});
+        this.setState({journalentries : response.data.journalentries});
         
     }
     approveBillRequest = async (id)=>{
@@ -216,9 +231,28 @@ class Approval extends React.Component{
         const response = await axios.post('http://localhost/Accounting_modified/public/api/delete_credit_note_edit',bodyFormData);
         this.getApprovalsData();
     }
+    delete_entry_request = async (id) =>{
+        var bodyFormData = new FormData();
+        bodyFormData.set('id', id);
+        const response = await axios.post('http://localhost/Accounting_modified/public/api/delete_entry_request',bodyFormData);
+        this.getApprovalsData();
+    }
+    update_entry = async (id) =>{
+        var bodyFormData = new FormData();
+        bodyFormData.set('id', id);
+        const response = await axios.post('http://localhost/Accounting_modified/public/api/update_entry',bodyFormData);
+        this.getApprovalsData();
+    }
+    get_cancel_entry_desc = async (id) =>{
+        return [
+            <div>
+                {"asdasd"}
+            </div>
+        ]
+    }
     componentDidMount(){
         this.getApprovalsData();
-        
+        this.getUserAccess();
     }
 
     render(){
@@ -498,7 +532,45 @@ class Approval extends React.Component{
                 </tr>
             ]
         });
-        
+        const PendingCancelEntryList = this.state.PendingCancelEntry.map((dat,index) => {
+            return [
+                <tr key={index}>
+                    <td style={{verticalAlign : 'middle'}}>{moment(dat.created_at).format('MM-DD-YYYY')}</td>
+                    <td style={{verticalAlign : 'middle',textAlign : 'center'}}>{dat.entry_id.replace("Journal-", "")}</td>
+                    <td style={{verticalAlign : 'middle'}}>{dat.type=="Invoice"? dat.locationss+" "+dat.invoice_type : dat.type}</td>
+                    <td style={{verticalAlign : 'middle'}}>
+                        {this.state.journalentries.map((coa,inn)=>{
+                            if(dat.type=="Invoice" || dat.type=="Sales Receipt"){
+                                if(coa.other_no==dat.entry_id && coa.je_transaction_type==dat.type && coa.je_invoice_location_and_type==dat.locationss+" "+dat.invoice_type){
+                                    return [
+                                        <div>
+                                            {coa.je_desc+" \n"}
+                                        </div> 
+                                    ]
+                                }
+                            }else{
+                                if(coa.other_no==dat.entry_id && coa.je_transaction_type==dat.type && coa.je_invoice_location_and_type==null){
+                                    return [
+                                        <div>
+                                            {coa.je_desc+" \n"}
+                                        </div>
+                                    ]
+                                }
+                            }
+                            
+                        })}
+                    
+                    </td>
+                    <td style={{verticalAlign : 'middle'}}>{dat.Reason}</td>
+                    <td style={{verticalAlign : 'middle',textAlign : 'center'}}>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="">
+                        <button title="Approve" onClick={()=>this.update_entry(dat.id)} type="button" class="btn btn-success"><span class="fa fa-check"></span></button>
+                        <button type="button" onClick={()=>this.delete_entry_request(dat.id)}  title="Deny" class="btn btn-danger"><span class="fa fa-times"></span></button>
+                        </div>
+                    </td>
+                </tr>
+            ]
+        })
         // const data=this.state.data.map((dat) =>{
         //     return []
         // });
@@ -521,45 +593,79 @@ class Approval extends React.Component{
                         </div>
                         <div class="card-body">
                             <ul class="nav nav-tabs" id="myTabApprovals" role="tablist">
+                                {this.state.access!=null && this.state.access.approval_pending_bills=="1"? 
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="pending_bill_tab-tab" data-toggle="tab" href="#pending_bill_tab" role="tab" aria-controls="profile" aria-selected="false">Pending Bill <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.etNewcount}</span></a>
+                                    <a class="nav-link " id="pending_bill_tab-tab" data-toggle="tab" href="#pending_bill_tab" role="tab" aria-controls="profile" aria-selected="false">Pending Bill <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.etNewcount}</span></a>
                                 </li>
+                                : ''}
+                                {this.state.access!=null && this.state.access.approval_bank=="1"? 
                                 <li class="nav-item">
                                     <a class="nav-link " id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Bank <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.bankeditscount}</span></a>
                                 </li>
+                                : ''}
+                                {this.state.access!=null && this.state.access.approval_coa=="1"? 
                                 <li class="nav-item">
                                     <a class="nav-link" id="coa_tab-tab" data-toggle="tab" href="#coa_tab" role="tab" aria-controls="profile" aria-selected="false">Chart of Accounts <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.coaeditscount}</span></a>
                                 </li>
+                                : ''}
+                                {this.state.access!=null && this.state.access.approval_cc=="1"? 
                                 <li class="nav-item">
                                     <a class="nav-link" id="cc_tab-tab" data-toggle="tab" href="#cc_tab" role="tab" aria-controls="profile" aria-selected="false">Cost Center <span style={{borderRadius : '10rem'}}class="badge badge-pill badge-danger">{this.state.costcentereditcount}</span></a>
                                 </li>
-                                
+                                : ''}
+                                {this.state.access!=null && this.state.access.approval_customer=="1"? 
                                 <li class="nav-item">
                                     <a class="nav-link" id="customer_tab-tab" data-toggle="tab" href="#customer_tab" role="tab" aria-controls="profile" aria-selected="false">Customer <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.customereditcount}</span></a>
                                 </li>
-                                
+                                : ''}
+                                {this.state.access!=null && this.state.access.approval_supplier=="1"? 
                                 <li class="nav-item">
                                     <a class="nav-link" id="supplier_tab-tab" data-toggle="tab" href="#supplier_tab" role="tab" aria-controls="profile" aria-selected="false">Supplier <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.suppliereditcount}</span></a>
                                 </li>
-                                
+                                : ''}
+                                {this.state.access!=null && this.state.access.approval_product_services=="1"? 
                                 <li class="nav-item">
                                     <a class="nav-link" id="product_tab-tab" data-toggle="tab" href="#product_tab" role="tab" aria-controls="profile" aria-selected="false">Products and Services <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.productserviceseditcount}</span></a>
                                 </li>
-                                
+                                : ''}
+                                {this.state.access!=null && this.state.access.approval_sales=="1"? 
                                 <li class="nav-item">
                                     <a class="nav-link" id="sales_tab-tab" data-toggle="tab" href="#sales_tab" role="tab" aria-controls="profile" aria-selected="false">Sales Transaction <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.salestransactionediteditcount}</span></a>
                                 </li>
-                                
+                                : ''}
+                                {this.state.access!=null && this.state.access.approval_expense=="1"? 
                                 <li class="nav-item">
                                     <a class="nav-link" id="expense_transaction_tab-tab" data-toggle="tab" href="#expense_transaction_tab" role="tab" aria-controls="profile" aria-selected="false">Expense Transaction <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.expensetransactioneditcount}</span></a>
                                 </li>
-                                
+                                : ''}
+                                {this.state.access!=null && this.state.access.approval_boq=="1"? 
                                 <li class="nav-item">
                                     <a class="nav-link" id="bid_of_quotation_tab-tab" data-toggle="tab" href="#bid_of_quotation_tab" role="tab" aria-controls="profile" aria-selected="false">Bid of Quotation <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.budgeteditcount}</span></a>
                                 </li>
-                               
+                                : ''}
+                                <li class="nav-item">
+                                    <a class="nav-link" id="entry-tab" data-toggle="tab" href="#entry_tab" role="tab" aria-controls="profile" aria-selected="false">Cancelled Entries <span style={{borderRadius : '10rem'}} class="badge badge-pill badge-danger">{this.state.PendingCancelEntrycount}</span></a>
+                                </li>
                             </ul>
                             <div class="tab-content pl-3 p-1" id="myTabContent">
+                                <div class="tab-pane fade show " id="entry_tab" role="tabpanel" aria-labelledby="home-tab">
+                                <h3 class="mt-2">Cancelled Entries</h3>
+                                    <table class="table table-bordered" style={{backgroundColor : 'white'}} id="table_entry_approval">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th style={{verticalAlign : 'middle'}}>Request Date</th>
+                                                <th style={{verticalAlign : 'middle'}}>Entry No</th>
+                                                <th style={{verticalAlign : 'middle'}}>Type</th>
+                                                <th style={{verticalAlign : 'middle'}}>Description</th>
+                                                <th style={{verticalAlign : 'middle'}}>Reason for Cancellation</th>
+                                                <th style={{verticalAlign : 'middle'}}></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {PendingCancelEntryList}
+                                        </tbody>
+                                    </table>
+                                </div>
                                 <div class="tab-pane fade show " id="home" role="tabpanel" aria-labelledby="home-tab">
                                 <h3 class="mt-2">Bank</h3>
                                     <table class="table table-bordered" style={{backgroundColor : 'white'}} id="table_coa_approval">
@@ -719,7 +825,7 @@ class Approval extends React.Component{
                                     </tbody>
                                     </table>
                                 </div>
-                                <div class="tab-pane fade show active" id="pending_bill_tab" role="tabpanel" aria-labelledby="pending_bill_tab-tab">
+                                <div class="tab-pane fade show " id="pending_bill_tab" role="tabpanel" aria-labelledby="pending_bill_tab-tab">
                                 <h3 class="mt-2">Pending Bill</h3>
                                     <table class="table table-bordered" style={{backgroundColor : 'white'}} id="table_pending_bill">
                                     <thead class="thead-dark">
